@@ -2,6 +2,8 @@
 
 :root {
     /* Reduced, focused palette using variables for easy theming */
+    justify-content: space-between;
+    min-height: 420px; /* ensure consistent card height and vertical layout */
     --font-sans: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --bg: #ffffff;              /* page background */
     --surface: #ffffff;         /* cards, surfaces */
@@ -9,6 +11,7 @@
     --muted: #6b7280;           /* secondary text */
     --accent: #2563eb;          /* primary accent (blue) */
     --accent-2: #f59e0b;        /* secondary accent */
+    justify-content: space-between; /* keep actions at bottom */
     --success: #10b981;
     --danger: #ef4444;
     --radius: 12px;
@@ -22,6 +25,7 @@
 }
 
 /* Dark theme overrides */
+    line-height: 1.25;
 [data-theme="dark"] {
     --bg: #0b1220;
     --surface: #0f1724;
