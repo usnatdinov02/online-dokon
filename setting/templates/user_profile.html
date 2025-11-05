@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - Mercedes-Benz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% load static %}{% static 'style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-lg">
+            <div class="container">
+                <a class="navbar-brand fw-bold fs-3" href="{% url 'home' %}">
+                    <i class="fas fa-copyright"></i> Mercedes-Benz
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'home' %}">Bosh Sahifa</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'product_list' %}">Avtomobillar</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'cart' %}">Savat <span id="cart-count" class="badge bg-danger">0</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="d-flex" id="authSection">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-2"></i>{{ user.first_name|default:user.username }}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item active" href="{% url 'user_profile' %}"><i class="fas fa-user me-2"></i>Profil</a></li>
+                            <li><a class="dropdown-item" href="{% url 'order_history' %}"><i class="fas fa-shopping-bag me-2"></i>Buyurtmalarim</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Chiqish</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-light py-3">
+        <div class="container">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Bosh Sahifa</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Profil</li>
+            </ol>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container my-5">
+            <div class="row">
+                <!-- Profile Sidebar -->
+                <div class="col-lg-3 mb-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="profile-avatar mb-3">
+                                <i class="fas fa-user-circle fa-5x text-primary"></i>
+                            </div>
+                            <h5 class="card-title">{{ user.first_name }} {{ user.last_name }}</h5>
+                            <p class="text-muted">{{ user.email }}</p>
+                            <p class="small text-muted">A'zo bo'lgan sana: {{ user.date_joined|date:"d.m.Y" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Tez o'tish</h6>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            <a href="{% url 'user_profile' %}" class="list-group-item list-group-item-action active">
+                                <i class="fas fa-user me-2"></i>Profil ma'lumotlari
+                            </a>
+                            <a href="{% url 'order_history' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-shopping-bag me-2"></i>Buyurtmalarim
+                            </a>
+                            <a href="{% url 'cart' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-shopping-cart me-2"></i>Savatcha
+                            </a>
+                            <a href="{% url 'product_list' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-car me-2"></i>Mahsulotlar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Content -->
+                <div class="col-lg-9">
+                    <!-- Welcome Message -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                <i class="fas fa-home me-2"></i>Xush kelibsiz, {{ user.first_name|default:user.username }}!
+                            </h4>
+                            <p class="card-text text-muted">Sizning shaxsiy kabinetingizga xush kelibsiz. Bu yerda barcha buyurtmalaringizni kuzatib borishingiz va profil ma'lumotlaringizni boshqarishingiz mumkin.</p>
+                        </div>
+                    </div>
+
+                    <!-- Profile Information -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-edit me-2"></i>Profil ma'lumotlari
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Ism</label>
+                                    <p class="form-control-plaintext">{{ user.first_name|default:"Kiritilmagan" }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Familiya</label>
+                                    <p class="form-control-plaintext">{{ user.last_name|default:"Kiritilmagan" }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Foydalanuvchi nomi</label>
+                                    <p class="form-control-plaintext">{{ user.username }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Email</label>
+                                    <p class="form-control-plaintext">{{ user.email }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">A'zo bo'lgan sana</label>
+                                    <p class="form-control-plaintext">{{ user.date_joined|date:"d.m.Y H:i" }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Oxirgi kirish</label>
+                                    <p class="form-control-plaintext">{{ user.last_login|date:"d.m.Y H:i"|default:"Birinchi marta" }}</p>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                                    <i class="fas fa-edit me-2"></i>Ma'lumotlarni tahrirlash
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-shopping-bag me-2"></i>So'nggi buyurtmalar
+                            </h5>
+                            <a href="{% url 'order_history' %}" class="btn btn-outline-primary btn-sm">
+                                Barchasini ko'rish
+                            </a>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if orders %}
+                                {% for order in orders %}
+                                <div class="border-bottom p-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-3">
+                                            <strong>#{{ order.id }}</strong>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <span class="badge bg-{% if order.status == 'delivered' %}success{% elif order.status == 'pending' %}warning{% elif order.status == 'processing' %}info{% elif order.status == 'shipped' %}primary{% else %}danger{% endif %}">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <strong>${{ order.total_amount }}</strong>
+                                        </div>
+                                        <div class="col-md-3 text-end">
+                                            <a href="{% url 'order_detail' order.id %}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i> Ko'rish
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
+                                    <h6 class="text-muted">Hozircha buyurtmalar yo'q</h6>
+                                    <a href="{% url 'product_list' %}" class="btn btn-primary">
+                                        <i class="fas fa-shopping-cart me-2"></i>Xarid qilishni boshlash
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-shopping-bag fa-2x text-primary mb-2"></i>
+                                    <h5 class="card-title">{{ orders|length }}</h5>
+                                    <p class="card-text text-muted">Jami buyurtmalar</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-dollar-sign fa-2x text-success mb-2"></i>
+                                    <h5 class="card-title">${{ user.orders.aggregate.total|default:0 }}</h5>
+                                    <p class="card-text text-muted">Jami xarid</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-star fa-2x text-warning mb-2"></i>
+                                    <h5 class="card-title">VIP</h5>
+                                    <p class="card-text text-muted">A'zo darajasi</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Profil ma'lumotlarini tahrirlash</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'user_profile' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="first_name" class="form-label">Ism</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="last_name" class="form-label">Familiya</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                    <button type="button" class="btn btn-primary">Saqlash</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p>&copy; 2025 Mercedes-Benz. Barcha huquqlar himoyalangan.</p>
+            <p><a href="privacy.html" class="text-white">Maxfiylik siyosati</a> | <a href="contact.html" class="text-white">Aloqa</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% load static %}{% static 'script.js' %}"></script>
+</body>
+</html>

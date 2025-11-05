@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>{{ product.name }} - Mercedes-Benz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% load static %}{% static 'style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Mobile Responsive Fixes */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+        .container {
+            max-width: 1320px;
+            padding-left: 15px;
+            padding-right: 15px;
+            margin: 0 auto;
+        }
+        
+        @media (max-width: 1400px) {
+            .container {
+                max-width: 1140px;
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 960px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .container {
+                max-width: 720px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                max-width: 540px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container {
+                max-width: 100%;
+            }
+        }
+        
+        /* Product Image - Desktop */
+        .product-image-container {
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .product-image-container img {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: cover;
+        }
+        
+        /* Product Title - Desktop */
+        .product-title {
+            font-size: 2.5rem;
+            word-wrap: break-word;
+        }
+        
+        /* Price Section - Desktop */
+        .price-section h2 {
+            font-size: 3rem;
+        }
+        
+        /* Tablet */
+        @media (max-width: 992px) {
+            .product-image-container img {
+                max-height: 400px;
+            }
+            
+            .product-title {
+                font-size: 2rem;
+            }
+            
+            .price-section h2 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .product-image-container img {
+                max-height: 300px;
+            }
+            
+            .product-title {
+                font-size: 1.75rem;
+            }
+            
+            .price-section h2 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .product-image-container img {
+                max-height: 250px;
+            }
+            
+            .product-title {
+                font-size: 1.3rem;
+            }
+            
+            .price-section h2 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* Product Actions */
+        .product-actions .d-grid,
+        .product-actions .d-md-flex {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .product-actions .btn {
+            width: 100%;
+        }
+        
+        @media (min-width: 768px) {
+            .product-actions .d-md-flex {
+                flex-direction: row;
+            }
+            
+            .product-actions .btn {
+                width: auto;
+            }
+        }
+        
+        /* Quantity Input */
+        #quantity {
+            font-size: 16px;
+        }
+        
+        /* Related Products - 2 columns on mobile */
+        @media (max-width: 576px) {
+            .row > .col-lg-3,
+            .row > .col-md-6 {
+                width: 50% !important;
+                flex: 0 0 50%;
+                max-width: 50%;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            
+            .product-card .card-body {
+                padding: 0.75rem;
+            }
+            
+            .product-card .card-title {
+                font-size: 0.9rem;
+            }
+            
+            .product-card .card-text {
+                font-size: 0.75rem;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                line-clamp: 2;
+            }
+            
+            .product-card .btn {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.5rem;
+            }
+        }
+        
+        /* Breadcrumb */
+        .breadcrumb {
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 576px) {
+            .breadcrumb {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-lg">
+{{ ... }}
+                <a class="navbar-brand fw-bold fs-3" href="{% url 'home' %}">
+                    <i class="fas fa-copyright"></i> Mercedes-Benz
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'home' %}">Bosh Sahifa</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'product_list' %}">Avtomobillar</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'faq' %}">FAQ</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'contact' %}">Aloqa</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'cart' %}">Savat <span id="cart-count" class="badge bg-danger">0</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="d-flex align-items-center" id="authSection">
+                    <!-- Theme toggle button (light / dark) -->
+                    <button id="theme-toggle" class="btn btn-outline-light me-3" aria-label="Toggle theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    {% if user.is_authenticated %}
+                        <span class="text-light me-3">Salom, {{ user.first_name|default:user.username }}!</span>
+                        <a href="{% url 'logout' %}" class="btn btn-outline-light">Chiqish</a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="btn btn-outline-light me-2">Ro'yxatdan o'tish</a>
+                        <a href="{% url 'admin:login' %}" class="btn btn-outline-light">Kirish</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-light py-3">
+        <div class="container">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Bosh Sahifa</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'product_list' %}">Avtomobillar</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'category_products' product.category.id %}">{{ product.category.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+            </ol>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container my-5">
+            <div class="row">
+                <!-- Product Image -->
+                <div class="col-lg-6 mb-4">
+                    <div class="product-image-container">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="img-fluid rounded shadow" alt="{{ product.name }}" id="main-image">
+                        {% else %}
+                            <img src="https://via.placeholder.com/600x400?text=No+Image" class="img-fluid rounded shadow" alt="{{ product.name }}" id="main-image">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Product Details -->
+                <div class="col-lg-6">
+                    <div class="product-details">
+                        <h1 class="product-title mb-3">{{ product.name }}</h1>
+                        
+                        <div class="product-meta mb-4">
+                            <span class="badge bg-primary me-2">{{ product.category.name }}</span>
+                            {% if product.is_featured %}
+                                <span class="badge bg-warning">Tavsiya etiladi</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="price-section mb-4">
+                            <h2 class="text-primary mb-0">${{ product.price }}</h2>
+                            {% if product.stock > 0 %}
+                                <p class="text-success mb-0">
+                                    <i class="fas fa-check-circle"></i> Omborda: {{ product.stock }} ta
+                                </p>
+                            {% else %}
+                                <p class="text-danger mb-0">
+                                    <i class="fas fa-times-circle"></i> Omborda yo'q
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <div class="product-description mb-4">
+                            <h5>Tavsif</h5>
+                            <p class="text-muted">{{ product.description|linebreaks }}</p>
+                        </div>
+
+                        <div class="product-actions">
+                            {% if product.stock > 0 %}
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="quantity" class="form-label">Miqdor:</label>
+                                        <input type="number" class="form-control" id="quantity" value="1" min="1" max="{{ product.stock }}">
+                                    </div>
+                                </div>
+                                <div class="d-grid gap-2 d-md-flex">
+                                    <button class="btn btn-primary btn-lg add-to-cart-btn" data-id="{{ product.id }}">
+                                        <i class="fas fa-cart-plus"></i> Savatchaga qo'shish
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-lg">
+                                        <i class="fas fa-heart"></i> Sevimlilar
+                                    </button>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-warning" role="alert">
+                                    <i class="fas fa-exclamation-triangle"></i> Uzr, bu mahsulot hozircha omborda yo'q.
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="product-features mt-4">
+                            <h6>Xususiyatlar:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i> Yuqori sifatli materiallar</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Zamonaviy dizayn</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Kafolatli xizmat</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Tez yetkazib berish</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Products -->
+            {% if related_products %}
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h3 class="mb-4">O'xshash Mahsulotlar</h3>
+                    <div class="row">
+                        {% for related_product in related_products %}
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <div class="card product-card shadow-sm h-100">
+                                {% if related_product.image %}
+                                    <img src="{{ related_product.image.url }}" class="card-img-top" alt="{{ related_product.name }}" style="height: 200px; object-fit: cover;">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top" alt="{{ related_product.name }}" style="height: 200px; object-fit: cover;">
+                                {% endif %}
+                                <div class="card-body d-flex flex-column">
+                                    <h6 class="card-title">{{ related_product.name }}</h6>
+                                    <p class="card-text text-muted small">{{ related_product.description|truncatewords:10 }}</p>
+                                    <div class="mt-auto">
+                                        <p class="card-text">
+                                            <strong class="text-primary">${{ related_product.price }}</strong>
+                                        </p>
+                                        <div class="d-flex justify-content-between">
+                                            <a href="{% url 'product_detail' related_product.id %}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if related_product.stock > 0 %}
+                                                <button class="btn btn-primary btn-sm add-to-cart-btn" data-id="{{ related_product.id }}">
+                                                    <i class="fas fa-cart-plus"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Reviews Section -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h3 class="mb-3">Sharhlar</h3>
+                    <div class="d-flex align-items-center mb-3">
+                        {% if avg_rating %}
+                            <div class="me-2">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= avg_rating|floatformat:0 %}
+                                        <i class="fas fa-star text-warning"></i>
+                                    {% elif forloop.counter <= avg_rating %}
+                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                    {% else %}
+                                        <i class="far fa-star text-warning"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="text-muted">O'rtacha baho: {{ avg_rating|floatformat:1 }} ({{ reviews_count }} ta sharh)</span>
+                        {% else %}
+                            <span class="text-muted">Hozircha sharhlar yo'q</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="list-group mb-4">
+                        {% for r in reviews %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ r.user.username }}</strong>
+                                    <small class="text-muted">{{ r.created_at|date:"Y-m-d H:i" }}</small>
+                                </div>
+                                <div class="mb-1">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= r.rating %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <p class="mb-0">{{ r.comment|linebreaksbr }}</p>
+                            </div>
+                        {% empty %}
+                            {% for fr in fake_reviews %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>{{ fr.username }}</strong>
+                                        <small class="text-muted">—</small>
+                                    </div>
+                                    <div class="mb-1">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= fr.rating %}
+                                                <i class="fas fa-star text-warning"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-warning"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <p class="mb-0">{{ fr.comment }}</p>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+
+                    {% if user.is_authenticated %}
+                        {% if can_review %}
+                            <div class="card mb-5">
+                                <div class="card-body">
+                                    <h5 class="card-title">Sharh qoldirish</h5>
+                                    <form method="post" action="{% url 'add_review' product.id %}">
+                                        {% csrf_token %}
+                                        <div class="mb-3">
+                                            <label class="form-label">Baholang:</label>
+                                            <div class="star-rating" data-selected="0">
+                                                {% for i in "12345" %}
+                                                    <i class="far fa-star text-warning fs-4 me-1 star" data-value="{{ forloop.counter }}"></i>
+                                                {% endfor %}
+                                                <input type="hidden" name="rating" id="ratingInput" value="0" />
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Sharh</label>
+                                            <textarea class="form-control" name="comment" rows="3" placeholder="Fikr-mulohazangizni yozing" required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Yuborish</button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% elif has_reviewed %}
+                            <div class="alert alert-info">Siz ushbu mahsulotga allaqachon sharh qoldirgansiz.</div>
+                        {% else %}
+                            <div class="alert alert-secondary">Sharh yozish uchun mahsulotni xarid qilib, yetkazib berilishi kerak.</div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-secondary">Sharh yozish uchun tizimga kiring.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        .star-rating .star { cursor: pointer; }
+        .star-rating .star.active { color: #ffc107; }
+    </style>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p>&copy; 2025 Mercedes-Benz. Barcha huquqlar himoyalangan.</p>
+            <p><a href="privacy.html" class="text-white">Maxfiylik siyosati</a> | <a href="contact.html" class="text-white">Aloqa</a></p>
+        </div>
+    </footer>
+
+    <!-- Mobile bottom navigation -->
+    <div class="mobile-bottom-nav d-md-none">
+        <a href="{% url 'home' %}"><i class="fas fa-home icon"></i><span>Uy</span></a>
+        <a href="{% url 'product_list' %}"><i class="fas fa-th-list icon"></i><span>Kategoriyalar</span></a>
+        <a href="{% url 'wishlist' %}"><i class="fas fa-heart icon"></i><span>Sevimlilar</span><span id="mobile-wishlist-count" class="badge bg-warning text-dark">0</span></a>
+        <a href="{% url 'cart' %}"><i class="fas fa-shopping-cart icon"></i><span>Savat</span><span id="mobile-cart-count" class="badge bg-danger">0</span></a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'user_profile' %}"><i class="fas fa-user icon"></i><span>Profil</span></a>
+        {% else %}
+            <a href="{% url 'register' %}"><i class="fas fa-user icon"></i><span>Kirish</span></a>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% load static %}{% static 'script.js' %}"></script>
+    <script src="animations.js"></script>
+    <script src="advanced-features.js"></script>
+</body>
+</html>
