@@ -1,0 +1,17 @@
+asgiref==3.10.0
+blinker==1.9.0
+click==8.3.0
+colorama==0.4.6
+Django==5.2.7
+Flask==3.1.2
+importlib_metadata==8.7.0
+itsdangerous==2.2.0
+Jinja2==3.1.6
+lxml==6.0.2
+MarkupSafe==3.0.3
+pillow==11.3.0
+pygal==3.0.5
+sqlparse==0.5.3
+tzdata==2025.2
+Werkzeug==3.1.3
+zipp==3.23.0
