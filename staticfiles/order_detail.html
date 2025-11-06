@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyurtma #{{ order.id }} - Mercedes-Benz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% load static %}{% static 'style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-lg">
+            <div class="container">
+                <a class="navbar-brand fw-bold fs-3" href="{% url 'home' %}">
+                    <i class="fas fa-copyright"></i> Mercedes-Benz
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'home' %}">Bosh Sahifa</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'product_list' %}">Avtomobillar</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'cart' %}">Savat <span id="cart-count" class="badge bg-danger">0</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="d-flex" id="authSection">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-2"></i>{{ user.first_name|default:user.username }}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'user_profile' %}"><i class="fas fa-user me-2"></i>Profil</a></li>
+                            <li><a class="dropdown-item" href="{% url 'order_history' %}"><i class="fas fa-shopping-bag me-2"></i>Buyurtmalarim</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Chiqish</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-light py-3">
+        <div class="container">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Bosh Sahifa</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'user_profile' %}">Profil</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'order_history' %}">Buyurtmalarim</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Buyurtma #{{ order.id }}</li>
+            </ol>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container my-5">
+            <div class="row">
+                <!-- Order Details -->
+                <div class="col-lg-8">
+                    <!-- Order Header -->
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="mb-0">Buyurtma #{{ order.id }}</h4>
+                                <small class="text-muted">Berilgan sana: {{ order.created_at|date:"d.m.Y H:i" }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-{% if order.status == 'delivered' %}success{% elif order.status == 'pending' %}warning{% elif order.status == 'processing' %}info{% elif order.status == 'shipped' %}primary{% else %}danger{% endif %} fs-5">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Buyurtma ma'lumotlari</h6>
+                                    <p><strong>Buyurtma raqami:</strong> #{{ order.id }}</p>
+                                    <p><strong>Berilgan sana:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+                                    <p><strong>Oxirgi yangilanish:</strong> {{ order.updated_at|date:"d.m.Y H:i" }}</p>
+                                    <p><strong>Jami summa:</strong> <span class="text-primary fs-5">${{ order.total_amount }}</span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Mijoz ma'lumotlari</h6>
+                                    <p><strong>Ism:</strong> {{ order.first_name }} {{ order.last_name }}</p>
+                                    <p><strong>Email:</strong> {{ order.email }}</p>
+                                    <p><strong>Telefon:</strong> {{ order.phone }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Buyurtma mahsulotlari</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            {% for item in order.items.all %}
+                            <div class="border-bottom p-3">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" class="img-fluid rounded" alt="{{ item.product.name }}" style="height: 80px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 80px;">
+                                                <i class="fas fa-image fa-2x text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="mb-1">{{ item.product.name }}</h6>
+                                        <p class="text-muted small mb-1">{{ item.product.category.name }}</p>
+                                        <p class="text-muted small mb-0">{{ item.product.description|truncatewords:15 }}</p>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <span class="badge bg-light text-dark">{{ item.quantity }} ta</span>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <div>
+                                            <div class="fw-bold">${{ item.price }}</div>
+                                            <div class="text-muted small">bitta</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12 text-end">
+                                        <strong class="text-primary">Jami: ${{ item.total_price }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Delivery Information -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Yetkazib berish ma'lumotlari</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Yetkazib berish manzili</h6>
+                                    <p class="mb-2">{{ order.address }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Aloqa ma'lumotlari</h6>
+                                    <p class="mb-1"><strong>Telefon:</strong> {{ order.phone }}</p>
+                                    <p class="mb-0"><strong>Email:</strong> {{ order.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Actions -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="mb-3">Buyurtma amallari</h6>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a href="{% url 'order_history' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-arrow-left me-2"></i>Buyurtmalar ro'yxatiga qaytish
+                                </a>
+                                {% if order.status == 'pending' %}
+                                    <button class="btn btn-outline-danger" onclick="cancelOrder({{ order.id }})">
+                                        <i class="fas fa-times me-2"></i>Buyurtmani bekor qilish
+                                    </button>
+                                {% endif %}
+                                {% if order.status == 'delivered' %}
+                                    <button class="btn btn-outline-success" onclick="rateOrder({{ order.id }})">
+                                        <i class="fas fa-star me-2"></i>Buyurtmani baholash
+                                    </button>
+                                {% endif %}
+                                <button class="btn btn-outline-info" onclick="printOrder()">
+                                    <i class="fas fa-print me-2"></i>Chop etish
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="col-lg-4">
+                    <!-- Order Status Timeline -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">Buyurtma holati</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <div class="timeline-item {% if order.status == 'pending' or order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">
+                                    <div class="timeline-marker bg-primary"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">Buyurtma qabul qilindi</h6>
+                                        <small class="text-muted">{{ order.created_at|date:"d.m.Y H:i" }}</small>
+                                    </div>
+                                </div>
+                                <div class="timeline-item {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">
+                                    <div class="timeline-marker bg-info"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">Jarayonda</h6>
+                                        <small class="text-muted">Mahsulot tayyorlanmoqda</small>
+                                    </div>
+                                </div>
+                                <div class="timeline-item {% if order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">
+                                    <div class="timeline-marker bg-warning"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">Yuborilgan</h6>
+                                        <small class="text-muted">Yetkazib berish yo'lida</small>
+                                    </div>
+                                </div>
+                                <div class="timeline-item {% if order.status == 'delivered' %}active{% endif %}">
+                                    <div class="timeline-marker bg-success"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">Yetkazilgan</h6>
+                                        <small class="text-muted">Buyurtma muvaffaqiyatli yetkazildi</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">Buyurtma xulosasi</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Mahsulotlar ({{ order.items.count }}):</span>
+                                <span>${{ order.total_amount }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Yetkazib berish:</span>
+                                <span class="text-success">Bepul</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <strong>Jami:</strong>
+                                <strong class="text-primary">${{ order.total_amount }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Support -->
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h6 class="card-title">Savollar bormi?</h6>
+                            <p class="text-muted small mb-3">Bizning mijozlar xizmati jamoasi sizga yordam berishga tayyor</p>
+                            <div class="d-grid gap-2">
+                                <a href="tel:+998901234567" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-phone me-2"></i>+998 90 123 45 67
+                                </a>
+                                <a href="mailto:info@mercedes.uz" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-envelope me-2"></i>info@mercedes.uz
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p>&copy; 2025 Mercedes-Benz. Barcha huquqlar himoyalangan.</p>
+            <p><a href="privacy.html" class="text-white">Maxfiylik siyosati</a> | <a href="contact.html" class="text-white">Aloqa</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% load static %}{% static 'script.js' %}"></script>
+    <script>
+        function cancelOrder(orderId) {
+            if (confirm('Bu buyurtmani bekor qilishni xohlaysizmi?')) {
+                // Here you would typically make an AJAX request to cancel the order
+                alert('Buyurtma bekor qilindi');
+                location.reload();
+            }
+        }
+
+        function rateOrder(orderId) {
+            // Here you would typically show a rating modal
+            alert('Baholash funksiyasi tez orada qo\'shiladi');
+        }
+
+        function printOrder() {
+            window.print();
+        }
+    </script>
+
+    <style>
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 20px;
+            width: 2px;
+            height: calc(100% + 10px);
+            background-color: #e5e7eb;
+        }
+
+        .timeline-item.active:not(:last-child)::before {
+            background-color: #3b82f6;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -25px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+        }
+
+        .timeline-item.active .timeline-marker {
+            background-color: #3b82f6;
+        }
+
+        .timeline-content {
+            margin-left: 10px;
+        }
+
+        @media print {
+            .header, .footer, .btn, .card-header {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin: 0 !important;
+            }
+        }
+    </style>
+</body>
+</html>
+
+
+
+

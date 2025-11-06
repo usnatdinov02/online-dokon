@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyurtmalarim - Mercedes-Benz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% load static %}{% static 'style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-lg">
+            <div class="container">
+                <a class="navbar-brand fw-bold fs-3" href="{% url 'home' %}">
+                    <i class="fas fa-copyright"></i> Mercedes-Benz
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'home' %}">Bosh Sahifa</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'product_list' %}">Avtomobillar</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'cart' %}">Savat <span id="cart-count" class="badge bg-danger">0</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="d-flex" id="authSection">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-2"></i>{{ user.first_name|default:user.username }}
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'user_profile' %}"><i class="fas fa-user me-2"></i>Profil</a></li>
+                            <li><a class="dropdown-item active" href="{% url 'order_history' %}"><i class="fas fa-shopping-bag me-2"></i>Buyurtmalarim</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Chiqish</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-light py-3">
+        <div class="container">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Bosh Sahifa</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'user_profile' %}">Profil</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Buyurtmalarim</li>
+            </ol>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container my-5">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-lg-3 mb-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="profile-avatar mb-3">
+                                <i class="fas fa-user-circle fa-5x text-primary"></i>
+                            </div>
+                            <h5 class="card-title">{{ user.first_name }} {{ user.last_name }}</h5>
+                            <p class="text-muted">{{ user.email }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Tez o'tish</h6>
+                        </div>
+                        <div class="list-group list-group-flush">
+                            <a href="{% url 'user_profile' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-user me-2"></i>Profil ma'lumotlari
+                            </a>
+                            <a href="{% url 'order_history' %}" class="list-group-item list-group-item-action active">
+                                <i class="fas fa-shopping-bag me-2"></i>Buyurtmalarim
+                            </a>
+                            <a href="{% url 'cart' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-shopping-cart me-2"></i>Savatcha
+                            </a>
+                            <a href="{% url 'product_list' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-car me-2"></i>Mahsulotlar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Content -->
+                <div class="col-lg-9">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Buyurtmalarim</h2>
+                        <div class="d-flex gap-2">
+                            <select class="form-select" style="width: auto;" onchange="filterOrders(this.value)">
+                                <option value="">Barcha buyurtmalar</option>
+                                <option value="pending">Kutilmoqda</option>
+                                <option value="processing">Jarayonda</option>
+                                <option value="shipped">Yuborilgan</option>
+                                <option value="delivered">Yetkazilgan</option>
+                                <option value="cancelled">Bekor qilingan</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {% if orders %}
+                        <div class="row">
+                            {% for order in orders %}
+                            <div class="col-12 mb-4">
+                                <div class="card order-card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-0">Buyurtma #{{ order.id }}</h5>
+                                            <small class="text-muted">{{ order.created_at|date:"d.m.Y H:i" }}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-{% if order.status == 'delivered' %}success{% elif order.status == 'pending' %}warning{% elif order.status == 'processing' %}info{% elif order.status == 'shipped' %}primary{% else %}danger{% endif %} fs-6">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                            <div class="mt-1">
+                                                <strong class="text-primary">${{ order.total_amount }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <h6 class="mb-2">Mahsulotlar:</h6>
+                                                <div class="row">
+                                                    {% for item in order.items.all %}
+                                                    <div class="col-md-6 mb-2">
+                                                        <div class="d-flex align-items-center">
+                                                            {% if item.product.image %}
+                                                                <img src="{{ item.product.image.url }}" class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;" alt="{{ item.product.name }}">
+                                                            {% else %}
+                                                                <div class="me-2 bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 4px;">
+                                                                    <i class="fas fa-image text-muted"></i>
+                                                                </div>
+                                                            {% endif %}
+                                                            <div>
+                                                                <div class="fw-bold">{{ item.product.name }}</div>
+                                                                <small class="text-muted">{{ item.quantity }} ta × ${{ item.price }}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <h6 class="mb-2">Yetkazib berish:</h6>
+                                                <p class="small mb-1"><strong>Manzil:</strong></p>
+                                                <p class="small text-muted mb-2">{{ order.address|truncatewords:10 }}</p>
+                                                <p class="small mb-1"><strong>Telefon:</strong> {{ order.phone }}</p>
+                                                <p class="small mb-1"><strong>Email:</strong> {{ order.email }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-12">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <small class="text-muted">Jami {{ order.items.count }} ta mahsulot</small>
+                                                    </div>
+                                                    <div class="d-flex gap-2">
+                                                        <a href="{% url 'order_detail' order.id %}" class="btn btn-outline-primary btn-sm">
+                                                            <i class="fas fa-eye me-1"></i>Batafsil
+                                                        </a>
+                                                        {% if order.status == 'pending' %}
+                                                            <button class="btn btn-outline-danger btn-sm" onclick="cancelOrder({{ order.id }})">
+                                                                <i class="fas fa-times me-1"></i>Bekor qilish
+                                                            </button>
+                                                        {% endif %}
+                                                        {% if order.status == 'delivered' %}
+                                                            <button class="btn btn-outline-success btn-sm">
+                                                                <i class="fas fa-star me-1"></i>Baholash
+                                                            </button>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Pagination -->
+                        {% if orders.has_other_pages %}
+                        <nav aria-label="Buyurtmalar sahifalari">
+                            <ul class="pagination justify-content-center">
+                                {% if orders.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ orders.previous_page_number }}">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in orders.paginator.page_range %}
+                                    {% if orders.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > orders.number|add:'-3' and num < orders.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if orders.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ orders.next_page_number }}">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ orders.paginator.num_pages }}">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <!-- Empty State -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-bag fa-4x text-muted mb-4"></i>
+                            <h3 class="text-muted">Hozircha buyurtmalar yo'q</h3>
+                            <p class="text-muted mb-4">Siz hali hech qanday buyurtma bermagansiz. Keling, ajoyib mahsulotlarimizni ko'rib chiqing!</p>
+                            <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-shopping-cart me-2"></i>Xarid qilishni boshlash
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p>&copy; 2025 Mercedes-Benz. Barcha huquqlar himoyalangan.</p>
+            <p><a href="privacy.html" class="text-white">Maxfiylik siyosati</a> | <a href="contact.html" class="text-white">Aloqa</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% load static %}{% static 'script.js' %}"></script>
+    <script>
+        function filterOrders(status) {
+            const url = new URL(window.location);
+            if (status) {
+                url.searchParams.set('status', status);
+            } else {
+                url.searchParams.delete('status');
+            }
+            window.location.href = url.toString();
+        }
+
+        function cancelOrder(orderId) {
+            if (confirm('Bu buyurtmani bekor qilishni xohlaysizmi?')) {
+                // Here you would typically make an AJAX request to cancel the order
+                alert('Buyurtma bekor qilindi');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>

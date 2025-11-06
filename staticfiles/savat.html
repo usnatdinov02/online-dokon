@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savat - Mercedes-Benz</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="index.html">Mercedes-Benz</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="index.html">Bosh Sahifa</a></li>
+                <li class="nav-item"><a class="nav-link" href="car-details.html">Avtomobillar</a></li>
+                <li class="nav-item"><a class="nav-link active" href="cart.html">Savat</a></li>
+                
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Cart Section -->
+<div class="container my-5">
+    <h2 class="mb-4">Sizning Savatingiz</h2>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th width="20%">Rasm</th>
+                    <th width="40%">Nomi</th>
+                    <th width="15%">Narxi</th>
+                    <th width="15%">Miqdor</th>
+                    <th width="10%">Jami</th>
+                    <th width="5%"></th>
+                </tr>
+            </thead>
+            <tbody id="cartItems">
+                <!-- Mahsulotlar dinamik ravishda joylashadi -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <h4>Umumiy: <span id="totalPrice">$0.00</span></h4>
+        <a class="nav-link text-uppercase fw-bold active" href="index.html">Xarid qilish</a>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-white text-center py-4 mt-5">
+    <p>&copy; 2025 Mercedes-Benz. Barcha huquqlar himoyalangan.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Misol uchun mahsulotlar
+    let cart = [
+        {
+            id: 1,
+            name: "Mercedes-Benz C-Class",
+            price: 50000,
+            image: "https://cdn.mercedes-benz.com/content/dam/mb-www/desktop/en/modelle/series/series-overview/hero/hero-2023-series-overview.jpg",
+            quantity: 1
+        }
+    ];
+
+    function renderCart() {
+        const tbody = document.getElementById('cartItems');
+        tbody.innerHTML = '';
+
+        let total = 0;
+
+        cart.forEach(item => {
+            const row = document.createElement('tr');
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+
+            row.innerHTML = `
+                <td><img src="${item.image}" class="img-fluid rounded" alt="${item.name}"></td>
+                <td>${item.name}</td>
+                <td>$${item.price.toLocaleString()}</td>
+                <td>
+                    <input type="number" min="1" value="${item.quantity}" class="form-control quantity" data-id="${item.id}">
+                </td>
+                <td>$${itemTotal.toLocaleString()}</td>
+                <td><button class="btn btn-danger remove-btn" data-id="${item.id}">O'chirish</button></td>
+            `;
+
+            tbody.appendChild(row);
+        });
+
+        document.getElementById('totalPrice').textContent = `$${total.toLocaleString()}`;
+
+        // O'chirish tugmasi funksiyasi
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = parseInt(this.getAttribute('data-id'));
+                cart = cart.filter(item => item.id !== id);
+                renderCart();
+            });
+        });
+
+        // Miqdor o'zgarganda
+        document.querySelectorAll('.quantity').forEach(input => {
+            input.addEventListener('change', function() {
+                const id = parseInt(this.getAttribute('data-id'));
+                const newQuantity = parseInt(this.value);
+                const item = cart.find(item => item.id === id);
+                if (item) {
+                    item.quantity = newQuantity;
+                    renderCart();
+                }
+            });
+        });
+    }
+
+    // Sahifa ochilganda render qilish
+    renderCart();
+</script>
+</body>
+</html>

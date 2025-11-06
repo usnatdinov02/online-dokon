@@ -12,13 +12,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-test-key-for-development-only'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['usnadtinov02.pythonanywhere.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/usnadtinov02/mercedes_shop/static'
+STATIC_ROOT = '/home/usnadtinov02/mercedes_shop/staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'setting' / 'templates',
 ]

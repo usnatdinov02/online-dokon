@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savat - Mercedes-Benz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-lg">
+            <div class="container">
+                <a class="navbar-brand fw-bold fs-3" href="{% url 'home' %}">
+                    <i class="fas fa-copyright"></i> Mercedes-Benz
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'home' %}">Bosh Sahifa</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'product_list' %}">Avtomobillar</a>
+                        </li>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-uppercase fw-bold active" href="{% url 'cart' %}">Savat <span id="cart-count" class="badge bg-danger">0</span></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="d-flex align-items-center" id="authSection">
+                    <!-- Theme toggle button (light / dark) -->
+                    <button id="theme-toggle" class="btn btn-outline-light me-3" aria-label="Toggle theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    {% if user.is_authenticated %}
+                        <span class="text-light me-3">Salom, {{ user.first_name|default:user.username }}!</span>
+                        <a href="{% url 'logout' %}" class="btn btn-outline-light">Chiqish</a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="btn btn-outline-light me-2">Ro'yxatdan o'tish</a>
+                        <a href="{% url 'admin:login' %}" class="btn btn-outline-light">Kirish</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="bg-light py-3">
+        <div class="container">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">Bosh Sahifa</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Savat</li>
+            </ol>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container my-5">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="mb-4">Savat</h1>
+                </div>
+            </div>
+
+            {% if cart_items %}
+            <div class="row">
+                <!-- Cart Items -->
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Savatchangizdagi mahsulotlar</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            {% for item in cart_items %}
+                            <div class="cart-item border-bottom p-3" data-item-id="{{ item.id }}">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" class="img-fluid rounded" alt="{{ item.product.name }}" style="height: 80px; object-fit: cover;">
+                                        {% else %}
+                                            <img src="https://via.placeholder.com/80x80?text=No+Image" class="img-fluid rounded" alt="{{ item.product.name }}">
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6 class="mb-1">{{ item.product.name }}</h6>
+                                        <p class="text-muted small mb-0">{{ item.product.category.name }}</p>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p class="mb-0"><strong>${{ item.product.price }}</strong></p>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="input-group input-group-sm">
+                                            <button class="btn btn-outline-secondary qty-decrease" type="button" data-item-id="{{ item.id }}">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <input type="number" class="form-control text-center qty-input" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" data-item-id="{{ item.id }}">
+                                            <button class="btn btn-outline-secondary qty-increase" type="button" data-item-id="{{ item.id }}">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p class="mb-0"><strong>${{ item.total_price }}</strong></p>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-outline-danger btn-sm remove-btn" data-item-id="{{ item.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Buyurtma xulosasi</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Mahsulotlar:</span>
+                                <span id="subtotal">${{ total_price }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Yetkazib berish:</span>
+                                <span class="text-success">Bepul</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3">
+                                <strong>Jami:</strong>
+                                <strong id="total-price">${{ total_price }}</strong>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-credit-card"></i> Buyurtma berish
+                                </a>
+                                <a href="{% url 'product_list' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-shopping-bag"></i> Xarid qilishni davom etish
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Promo Code -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">Promo kod</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Promo kodni kiriting">
+                                <button class="btn btn-outline-primary" type="button">Qo'llash</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- Empty Cart -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
+                        <h3 class="text-muted">Savatchangiz bo'sh</h3>
+                        <p class="text-muted mb-4">Hozircha savatchangizda mahsulot yo'q. Keling, ajoyib mahsulotlarimizni ko'rib chiqing!</p>
+                        <a href="{% url 'product_list' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-shopping-bag"></i> Xarid qilishni boshlash
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <p>&copy; 2025 Mercedes-Benz. Barcha huquqlar himoyalangan.</p>
+            <p><a href="{% url 'terms' %}" class="text-white">Foydalanish shartlari</a> | <a href="{% url 'contact' %}" class="text-white">Aloqa</a></p>
+        </div>
+    </footer>
+
+    <!-- Mobile bottom navigation -->
+    <div class="mobile-bottom-nav d-md-none">
+        <a href="{% url 'home' %}"><i class="fas fa-home icon"></i><span>Uy</span></a>
+        <a href="{% url 'product_list' %}"><i class="fas fa-th-list icon"></i><span>Kategoriyalar</span></a>
+        <a href="{% url 'wishlist' %}"><i class="fas fa-heart icon"></i><span>Sevimlilar</span><span id="mobile-wishlist-count" class="badge bg-warning text-dark">0</span></a>
+        <a href="{% url 'cart' %}"><i class="fas fa-shopping-cart icon"></i><span>Savat</span><span id="mobile-cart-count" class="badge bg-danger">0</span></a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'user_profile' %}"><i class="fas fa-user icon"></i><span>Profil</span></a>
+        {% else %}
+            <a href="{% url 'register' %}"><i class="fas fa-user icon"></i><span>Kirish</span></a>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'script.js' %}"></script>
+</body>
+</html>
