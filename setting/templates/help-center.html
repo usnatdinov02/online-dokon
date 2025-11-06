@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yordam markazi</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <header class="header">
+    <div class="container py-3 d-flex justify-content-between align-items-center">
+      <a href="/" class="navbar-brand">Mercedes-Benz Shop</a>
+      <button id="theme-toggle" class="btn btn-outline-primary btn-sm" aria-pressed="false" aria-label="Rejimni almashtirish">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="main-content container py-4">
+    <nav aria-label="breadcrumb" class="breadcrumb mb-3">
+      <a class="breadcrumb-item" href="/">Bosh sahifa</a>
+      <span class="breadcrumb-item active">Yordam markazi</span>
+    </nav>
+
+    <h1 class="section-title text-center">Yordam markazi</h1>
+
+    <section class="card mb-3">
+      <div class="card-body">
+        <h2 class="h5">Tez-tez beriladigan savollar</h2>
+        <div class="accordion" id="faqAccordion">
+          <div class="mb-2">
+            <button class="btn btn-outline-primary w-100 text-start" data-bs-toggle="collapse" data-bs-target="#faq1">Buyurtmani qanday beraman?</button>
+            <div id="faq1" class="collapse show">
+              <div class="p-2">
+                Katalogdan mahsulotni tanlang, “Savatga qo‘shish” tugmasini bosing. Keyin savatga o‘ting va “Buyurtma berish” tugmasini bosing.
+              </div>
+            </div>
+          </div>
+          <div class="mb-2">
+            <button class="btn btn-outline-primary w-100 text-start" data-bs-toggle="collapse" data-bs-target="#faq2">To‘lov usullari qaysilar?</button>
+            <div id="faq2" class="collapse">
+              <div class="p-2">
+                Karta orqali onlayn to‘lov, Click/Payme, naqd to‘lov (kuryerga) va muddatli to‘lov variantlari mavjud.
+              </div>
+            </div>
+          </div>
+          <div class="mb-2">
+            <button class="btn btn-outline-primary w-100 text-start" data-bs-toggle="collapse" data-bs-target="#faq3">Qaytarish siyosati qanday?</button>
+            <div id="faq3" class="collapse">
+              <div class="p-2">
+                14 kun ichida ishlatilmagan, qadoqlangan mahsulotni chek bilan qaytarishingiz mumkin. Ayrim toifalarda istisnolar mavjud.
+              </div>
+            </div>
+          </div>
+          <div class="mb-2">
+            <button class="btn btn-outline-primary w-100 text-start" data-bs-toggle="collapse" data-bs-target="#faq4">Yetkazib berish muddati?</button>
+            <div id="faq4" class="collapse">
+              <div class="p-2">
+                Toshkent bo‘yicha 1-2 ish kuni, viloyatlarga 2-5 ish kuni ichida yetkazib beriladi.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card mb-3">
+      <div class="card-body">
+        <h2 class="h5">Qo‘llanmalar</h2>
+        <ul class="mb-0">
+          <li>Profilni sozlash va manzillarni boshqarish</li>
+          <li>Savat, saralangan va buyurtmalar tarixidan foydalanish</li>
+          <li>Chegirma kodlari va aktsiyalar</li>
+          <li>To‘lovda xatoliklar va ularni bartaraf etish</li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/static/script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
