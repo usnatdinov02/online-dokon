@@ -1,4 +1,5 @@
 // Mercedes-Benz Online Shop JavaScript
+// Mobile-focused UX enhancements: sticky bars, improved counters, menu/search toggles
 
 function initAll() {
     // Theme (dark mode) initialization
@@ -58,30 +59,30 @@ function initAll() {
             if (document.querySelector('.mobile-bottom-nav')) return; // already present
 
             const html = `\
-    <div class="mobile-bottom-nav d-md-none">\
-        <a href="/" class="${window.location.pathname === '/' ? 'active' : ''}">\
-            <i class="far fa-smile icon"></i>\
+    <nav class="mobile-bottom-nav d-md-none" role="navigation" aria-label="Mobil pastki navigatsiya">\
+        <a href="/" class="${window.location.pathname === '/' ? 'active' : ''}" aria-label="Bosh sahifa">\
+            <i class="far fa-smile icon" aria-hidden="true"></i>\
             <span>Bosh sahifa</span>\
         </a>\
-        <a href="/products/" class="${window.location.pathname.includes('/products') ? 'active' : ''}">\
-            <i class="fas fa-th-large icon"></i>\
+        <a href="/products/" class="${window.location.pathname.includes('/products') ? 'active' : ''}" aria-label="Katalog">\
+            <i class="fas fa-th-large icon" aria-hidden="true"></i>\
             <span>Katalog</span>\
         </a>\
-        <a href="/cart/" class="${window.location.pathname.includes('/cart') ? 'active' : ''}">\
-            <i class="fas fa-shopping-cart icon"></i>\
+        <a href="/cart/" class="${window.location.pathname.includes('/cart') ? 'active' : ''}" aria-label="Savat">\
+            <i class="fas fa-shopping-cart icon" aria-hidden="true"></i>\
             <span>Savat</span>\
-            <span id="mobile-cart-count" class="badge bg-danger">0</span>\
+            <span id="mobile-cart-count" class="badge bg-danger" aria-live="polite">0</span>\
         </a>\
-        <a href="/wishlist/" class="${window.location.pathname.includes('/wishlist') ? 'active' : ''}">\
-            <i class="far fa-heart icon"></i>\
+        <a href="/wishlist/" class="${window.location.pathname.includes('/wishlist') ? 'active' : ''}" aria-label="Saralangan">\
+            <i class="far fa-heart icon" aria-hidden="true"></i>\
             <span>Saralangan</span>\
-            <span id="mobile-wishlist-count" class="badge bg-warning text-dark">0</span>\
+            <span id="mobile-wishlist-count" class="badge bg-warning text-dark" aria-live="polite">0</span>\
         </a>\
-        <a href="/profile/" class="${window.location.pathname.includes('/profile') ? 'active' : ''}">\
-            <i class="far fa-user icon"></i>\
+        <a href="/profile/" class="${window.location.pathname.includes('/profile') ? 'active' : ''}" aria-label="Kabinet">\
+            <i class="far fa-user icon" aria-hidden="true"></i>\
             <span>Kabinet</span>\
         </a>\
-    </div>`;
+    </nav>`;
 
             document.body.insertAdjacentHTML('beforeend', html);
 
@@ -96,16 +97,14 @@ function initAll() {
 
     createMobileBottomNav();
 
-    // Add to cart functionality
-    const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
-    addToCartBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const productId = this.getAttribute('data-id');
-            const quantity = document.getElementById('quantity') ? 
-                parseInt(document.getElementById('quantity').value) || 1 : 1;
-            
-            addToCart(productId, quantity);
-        });
+    // Add to cart functionality (delegate for dynamic content)
+    document.body.addEventListener('click', function(e){
+        const btn = e.target.closest('.add-to-cart-btn');
+        if (!btn) return;
+        const productId = btn.getAttribute('data-id');
+        const qtyInput = document.getElementById('quantity') || document.querySelector('.qty-input-global');
+        const quantity = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
+        addToCart(productId, quantity);
     });
 
     // Quantity controls (decrease/increase and manual input)
@@ -239,6 +238,15 @@ if (document.readyState === 'loading') {
 } else {
     initAll();
 }
+
+// Utility: observe main buttons to prevent overlap with bottom bars on mobile
+(function adjustBottomPadding(){
+    const main = document.querySelector('.main-content');
+    if (!main) return;
+    const pad = parseInt(getComputedStyle(main).paddingBottom || '0');
+    const extra = 96; // approx bottom bars height
+    if (pad < extra) main.style.paddingBottom = extra + 'px';
+})();
 
 // Add to cart function
 function addToCart(productId, quantity = 1) {
@@ -402,6 +410,11 @@ function updateCartCount() {
         // mobile badge (if present)
         const mobileCart = document.getElementById('mobile-cart-count');
         if (mobileCart) mobileCart.textContent = data.count;
+        // add bounce animation for feedback
+        if (mobileCart) {
+            mobileCart.classList.add('animate');
+            setTimeout(()=> mobileCart.classList.remove('animate'), 500);
+        }
     })
     .catch(error => {
         console.error('Error updating cart count:', error);
@@ -421,10 +434,13 @@ function updateWishlistCount() {
         els.forEach(el => el.textContent = data.count);
         const mobileWish = document.getElementById('mobile-wishlist-count');
         if (mobileWish) mobileWish.textContent = data.count;
+        if (mobileWish) {
+            mobileWish.classList.add('animate');
+            setTimeout(()=> mobileWish.classList.remove('animate'), 500);
+        }
     })
     .catch(err => {
         // silently ignore for anonymous users or if endpoint not available
-        // console.log('Wishlist count not available', err);
     });
 }
 

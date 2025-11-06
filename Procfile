@@ -1,0 +1,1 @@
+web: gunicorn "dars_project.2.wsgi"

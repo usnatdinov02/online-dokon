@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aloqa va Qo‘llab-quvvatlash</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container py-3 d-flex justify-content-between align-items-center">
+      <a href="/" class="navbar-brand">Mercedes-Benz Shop</a>
+      <button id="theme-toggle" class="btn btn-outline-primary btn-sm" aria-pressed="false" aria-label="Rejimni almashtirish">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="main-content container py-4">
+    <nav aria-label="breadcrumb" class="breadcrumb mb-3">
+      <a class="breadcrumb-item" href="/">Bosh sahifa</a>
+      <span class="breadcrumb-item active">Aloqa</span>
+    </nav>
+
+    <h1 class="section-title text-center">Aloqa va Qo‘llab-quvvatlash</h1>
+
+    <section class="card mb-3">
+      <div class="card-body">
+        <h2 class="h5">Bog‘lanish</h2>
+        <p class="mb-2"><i class="fas fa-phone me-2"></i> +998 71 123-45-67</p>
+        <p class="mb-2"><i class="fas fa-envelope me-2"></i> support@example.com</p>
+        <p class="mb-0"><i class="fas fa-clock me-2"></i> Dush–Yak 09:00–21:00</p>
+      </div>
+    </section>
+
+    <section class="card mb-3">
+      <div class="card-body">
+        <h2 class="h5">Filiallar</h2>
+        <ul>
+          <li>Toshkent, Yunusobod – Ish vaqti 10:00–20:00</li>
+          <li>Chilonzor – Ish vaqti 10:00–20:00</li>
+          <li>Qo‘yliq – Ish vaqti 10:00–20:00</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card mb-3">
+      <div class="card-body">
+        <h2 class="h5">Qayta aloqa</h2>
+        <form novalidate>
+          <div class="mb-2">
+            <label class="form-label" for="name">Ism</label>
+            <input class="form-control" id="name" name="name" required />
+          </div>
+          <div class="mb-2">
+            <label class="form-label" for="phone">Telefon</label>
+            <input class="form-control" id="phone" name="phone" type="tel" required />
+          </div>
+          <div class="mb-2">
+            <label class="form-label" for="msg">Xabar</label>
+            <textarea class="form-control" id="msg" name="msg" rows="3" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Yuborish</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>

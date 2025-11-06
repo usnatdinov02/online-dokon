@@ -230,6 +230,64 @@
                 </div>
             </div>
         </div>
+
+        <!-- Mobile: Yordam va ma'lumotlar bo'limi -->
+        <div class="container d-lg-none mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-circle-info me-2"></i>Yordam va ma'lumotlar</h5>
+                </div>
+                <div class="card-body pt-3">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button class="btn w-100 py-3 rounded-3 border profile-info-link" data-url="/about/">
+                                <i class="fas fa-building d-block mb-1"></i>
+                                <span class="small">Biz haqimizda</span>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn w-100 py-3 rounded-3 border profile-info-link" data-url="/help/">
+                                <i class="fas fa-question-circle d-block mb-1"></i>
+                                <span class="small">Yordam markazi</span>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn w-100 py-3 rounded-3 border profile-info-link" data-url="/shipping/">
+                                <i class="fas fa-truck-fast d-block mb-1"></i>
+                                <span class="small">Yetkazib berish</span>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn w-100 py-3 rounded-3 border profile-info-link" data-url="/returns/">
+                                <i class="fas fa-rotate-left d-block mb-1"></i>
+                                <span class="small">Qaytarish & Kafolat</span>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn w-100 py-3 rounded-3 border profile-info-link" data-url="/payments/">
+                                <i class="fas fa-credit-card d-block mb-1"></i>
+                                <span class="small">To‘lov usullari</span>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn w-100 py-3 rounded-3 border profile-info-link" data-url="/privacy/">
+                                <i class="fas fa-shield-halved d-block mb-1"></i>
+                                <span class="small">Maxfiylik</span>
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn w-100 py-3 rounded-3 border profile-info-link" data-url="/contact-mobile/">
+                                <i class="fas fa-headset d-block mb-1"></i>
+                                <span class="small">Aloqa va Qo‘llab-quvvatlash</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="profile-info-content" class="card-body border-top" style="min-height:160px">
+                    <div class="text-muted">Bo'limlardan birini tanlang, ma'lumot shu yerda ochiladi.</div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Edit Profile Modal -->
@@ -275,5 +333,47 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% load static %}{% static 'script.js' %}"></script>
+    <script>
+    // AJAX loader for mobile profile info links
+    (function(){
+        const container = document.getElementById('profile-info-content');
+        if (!container) return;
+        function extractMain(html){
+            const tmp = document.createElement('div');
+            // Strip out script tags to avoid duplicate init/errors
+            html = html.replace(/<script[\s\S]*?<\/script>/gi, '');
+            tmp.innerHTML = html;
+            const main = tmp.querySelector('main') || tmp.querySelector('.main-content') || tmp;
+            // Prefer visible content blocks only
+            const blocks = main.querySelectorAll('.card, .section-title');
+            if (blocks.length){
+                const frag = document.createElement('div');
+                blocks.forEach(b=>frag.appendChild(b.cloneNode(true)));
+                return frag.innerHTML;
+            }
+            return main.innerHTML;
+        }
+        function setLoading(){
+            container.innerHTML = '<div class="d-flex align-items-center"><span class="loading-spinner me-2"></span> Yuklanmoqda...</div>';
+        }
+        document.addEventListener('click', async function(e){
+            const btn = e.target.closest('.profile-info-link');
+            if (!btn) return;
+            const url = btn.getAttribute('data-url');
+            if (!url) return;
+            setLoading();
+            try{
+                const res = await fetch(url, {headers: {'X-Requested-With':'XMLHttpRequest'}});
+                if (!res.ok) throw new Error('HTTP '+res.status);
+                const text = await res.text();
+                container.innerHTML = extractMain(text);
+                window.scrollTo({top: container.getBoundingClientRect().top + window.scrollY - 20, behavior:'smooth'});
+            }catch(err){
+                // Fallback: redirect to full page if AJAX fails
+                window.location.href = url;
+            }
+        });
+    })();
+    </script>
 </body>
 </html>
