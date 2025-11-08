@@ -1,17 +1,233 @@
 <!DOCTYPE html>
 <html lang="uz">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Mahsulotlar - Mercedes-Benz</title>
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% load static %}{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Mobile First Responsive Fixes */
-        * {
-            box-sizing: border-box;
+        * { box-sizing: border-box; }
+        :root{--mb-primary:#0d6efd;--mb-secondary:#6c757d;--mb-success:#198754;--mb-danger:#dc3545;--mb-warning:#ffc107;--mb-info:#0dcaf0;--mb-dark:#212529;--gradient-primary:linear-gradient(135deg,#0d6efd,#0a58ca);--gradient-success:linear-gradient(135deg,#198754,#146c43);--shadow-sm:0 2px 8px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.12);--shadow-lg:0 8px 24px rgba(0,0,0,.16)}
+        
+        /* Sticky Mobile Header */
+        .mobile-header {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: white;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            display: none;
+            border-bottom: 1px solid #e9ecef;
         }
+        
+        @media (max-width: 768px) {
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .header {
+                display: none;
+            }
+        }
+        
+        .mobile-header .profile-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 2px solid var(--mb-primary);
+            object-fit: cover;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(13,110,253,0.2);
+        }
+        
+        .mobile-header .profile-avatar:active {
+            transform: scale(0.95);
+        }
+        
+        .mobile-header .search-box {
+            flex: 1;
+            position: relative;
+        }
+        
+        .mobile-header .search-box input {
+            width: 100%;
+            padding: 0.65rem 2.8rem 0.65rem 2.8rem;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background: white;
+            color: #1a1a2e;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-header .search-box input:focus {
+            outline: none;
+            border-color: #764ba2;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        
+        .mobile-header .search-box .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1rem;
+        }
+        
+        /* Dark Mode Styles */
+        [data-theme="dark"] .mobile-header {
+            background: #1a1a2e;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+        
+        [data-theme="dark"] .mobile-header .search-box input {
+            background: #0f1724;
+            color: #e6eef6;
+            border-color: #667eea;
+        }
+        
+        [data-theme="dark"] .mobile-header .search-box input:focus {
+            background: #0f1724;
+            border-color: #764ba2;
+        }
+        
+        [data-theme="dark"] .category-pills {
+            background: #1a1a2e;
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+        
+        [data-theme="dark"] .category-pill {
+            background: #0f1724;
+            color: #e6eef6;
+        }
+        
+        [data-theme="dark"] .category-pill.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .mobile-header .search-box .clear-search {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            cursor: pointer;
+            display: none;
+            font-size: 1rem;
+        }
+        
+        .mobile-header .search-box .clear-search.show {
+            display: block;
+        }
+        
+        .mobile-header .cart-icon {
+            position: relative;
+            color: var(--mb-dark);
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-header .cart-icon:active {
+            background: #f8f9fa;
+            transform: scale(0.95);
+        }
+        
+        .mobile-header .cart-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: var(--mb-danger);
+            color: white;
+            border-radius: 10px;
+            min-width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            padding: 0 4px;
+            box-shadow: 0 2px 4px rgba(220,53,69,0.3);
+        }
+        
+        /* Category Filter Pills */
+        .category-pills {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding: 0.75rem 1rem;
+            background: white;
+            position: sticky;
+            top: 60px;
+            z-index: 1020;
+            border-bottom: 1px solid #e9ecef;
+            scrollbar-width: none;
+        }
+        
+        .category-pills::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-pill {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            background: #f8f9fa;
+            color: var(--mb-dark);
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .category-pill:active {
+            transform: scale(0.95);
+        }
+        
+        .category-pill.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .category-pills {
+                display: flex;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .category-pills {
+                display: none;
+            }
+        }
+        
+        /* Floating quick actions (mobile) */
+        .quick-actions{position:fixed;right:14px;bottom:86px;z-index:1050;display:flex;flex-direction:column;gap:12px}
+        .quick-actions a{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;box-shadow:0 10px 24px rgba(0,0,0,.25);backdrop-filter:blur(6px)}
+        .qa-call{background:#28a745}
+        .qa-wa{background:#25D366}
+        .qa-tg{background:#0088cc}
+        @media(min-width:768px){.quick-actions{display:none}}
         
         body {
             overflow-x: hidden;
@@ -58,6 +274,29 @@
         /* Navbar fixes */
         .navbar-brand {
             font-size: 1.2rem !important;
+        }
+        
+        /* Desktop Search Styling */
+        .form-control {
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        
+        .form-select {
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-select:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
         }
         
         /* Tablet adjustments */
@@ -109,16 +348,32 @@
             }
         }
         
-        /* Product Cards - Default (Desktop) */
+        /* Product Cards - Modern Design */
         .product-card {
             width: 100%;
             margin-bottom: 1.5rem;
+            border-radius: 20px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: white;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
         }
         
         .product-card .card-img-top {
             width: 100%;
-            height: 250px;
+            height: 280px;
             object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .product-card:hover .card-img-top {
+            transform: scale(1.08);
         }
         
         .product-card .card-body {
@@ -126,17 +381,54 @@
         }
         
         .product-card .card-title {
-            font-size: 1.25rem;
+            font-size: 1.3rem;
+            font-weight: 700;
             margin-bottom: 0.75rem;
+            color: #1a1a2e;
         }
         
         .product-card .card-text {
             font-size: 1rem;
+            color: #6c757d;
         }
         
         .product-card .btn {
             font-size: 0.95rem;
-            padding: 0.6rem 1rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            border: none;
+            box-shadow: 0 4px 15px rgba(13,110,253,0.25);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(13,110,253,0.35);
+            filter: brightness(1.05);
+        }
+        
+        .btn-outline-primary {
+            border-radius: 12px;
+            border: 2px solid var(--mb-primary);
+            color: var(--mb-primary);
+            background: white;
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--mb-primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(13,110,253,0.25);
+        }
+        
+        .btn-outline-danger {
+            border-radius: 12px;
         }
         
         /* Button group - Desktop */
@@ -153,14 +445,16 @@
         @media (max-width: 576px) {
             .product-card {
                 font-size: 0.85rem;
+                border-radius: 16px;
             }
             
             .product-card .card-body {
-                padding: 0.75rem;
+                padding: 1rem;
             }
             
             .product-card .card-title {
-                font-size: 0.95rem;
+                font-size: 1rem;
+                font-weight: 700;
             }
             
             .product-card .card-text {
@@ -172,40 +466,129 @@
                 line-clamp: 2;
             }
             
-            /* Make action buttons compact on small screens while keeping 2-column grid */
+            .product-card .card-img-top {
+                height: 180px;
+            }
+            
+            /* Modern Mobile Buttons */
             .product-card .d-flex {
-                /* place buttons side-by-side when possible, wrap if needed */
-                flex-direction: row;
-                flex-wrap: wrap;
-                gap: 0.35rem;
-                justify-content: flex-start;
-                align-items: center;
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-top: 0.75rem;
             }
 
             .product-card .d-flex .btn {
-                width: auto;
-                display: inline-block;
-                font-size: 0.78rem;
-                padding: 0.35rem 0.6rem;
-                margin: 0;
-                min-width: 0;
-                max-width: 48%; /* two buttons side-by-side inside a half-width card */
-                box-sizing: border-box;
-                white-space: nowrap;
-                text-align: center;
+                width: 100%;
+                font-size: 0.85rem;
+                padding: 0.6rem 1rem;
+                border-radius: 10px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
             }
             
-            .product-card .card-img-top {
-                max-height: 180px;
+            .product-card .btn-primary {
+                background: var(--gradient-primary);
+                box-shadow: 0 4px 12px rgba(13,110,253,0.25);
+            }
+            
+            .product-card .btn-outline-primary {
+                border: 2px solid var(--mb-primary);
+                color: var(--mb-primary);
+                background: white;
             }
             
             .product-card .fs-4 {
                 font-size: 1.1rem !important;
             }
         }
+
+        /* Mobile bottom nav polish */
+        .mobile-bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-around;padding:.45rem .25rem;z-index:1040}
+        .mobile-bottom-nav a{color:#eaeaea;text-decoration:none;font-size:.8rem;display:flex;flex-direction:column;align-items:center;gap:2px}
+        .mobile-bottom-nav .icon{font-size:1.2rem;margin-bottom:2px;color:#fff}
+        .mobile-bottom-nav a:hover{color:#fff}
+        /* Floating Settings Button Styles */
+        .fab-settings {
+            transition: all 0.3s ease;
+        }
+        
+        .fab-settings:hover {
+            transform: scale(1.1) rotate(90deg);
+            filter: brightness(1.1);
+        }
+        
+        .fab-settings:active {
+            transform: scale(0.95);
+        }
+        
+        /* Desktop Settings Button */
+        @media (min-width: 769px) {
+            .fab-settings.d-none.d-md-flex {
+                position: fixed;
+                right: 20px;
+                top: 100px;
+                z-index: 1050;
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 4px 16px rgba(102,126,234,0.3);
+                text-decoration: none;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Mobile Sticky Header -->
+    <div class="mobile-header">
+        <a href="{% url 'user_profile' %}">
+            <img src="https://ui-avatars.com/api/?name={{ user.first_name|default:'User' }}+{{ user.last_name|default:'' }}&size=42&background=0d6efd&color=fff" 
+                 alt="Profile" class="profile-avatar">
+        </a>
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Qidirish..." id="mobileSearchInput">
+            <i class="fas fa-times clear-search" id="clearSearch"></i>
+        </div>
+        <a href="{% url 'cart' %}" class="cart-icon">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-badge" id="mobileCartCount">0</span>
+        </a>
+    </div>
+    
+    <!-- Category Pills (Mobile Only) -->
+    <div class="category-pills">
+        <div class="category-pill active" data-category="all">
+            <i class="fas fa-th me-1"></i> Barchasi
+        </div>
+        {% for category in categories %}
+        <div class="category-pill" data-category="{{ category.id }}">
+            {% if category.name|lower == 'sedan' %}
+                <i class="fas fa-car me-1"></i>
+            {% elif category.name|lower == 'suv' %}
+                <i class="fas fa-truck me-1"></i>
+            {% elif category.name|lower == 'coupe' %}
+                <i class="fas fa-car-side me-1"></i>
+            {% elif 'elektr' in category.name|lower or 'electric' in category.name|lower %}
+                <i class="fas fa-bolt me-1"></i>
+            {% elif category.name|lower == 'sport' %}
+                <i class="fas fa-flag-checkered me-1"></i>
+            {% elif category.name|lower == 'crossover' %}
+                <i class="fas fa-shuttle-van me-1"></i>
+            {% else %}
+                <i class="fas fa-car me-1"></i>
+            {% endif %}
+            {{ category.name }}
+        </div>
+        {% endfor %}
+    </div>
     <!-- Navbar -->
     <header class="header">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-lg">
@@ -217,32 +600,40 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    {% with lang=lang %}
                     <ul class="navbar-nav">
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold" href="{% url 'home' %}">Bosh Sahifa</a>
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'home' %}">{% if lang == 'ru' %}Главная{% else %}Bosh Sahifa{% endif %}</a>
                         </li>
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold active" href="{% url 'product_list' %}">Avtomobillar</a>
+                            <a class="nav-link text-uppercase fw-bold active" href="{% url 'product_list' %}">{% if lang == 'ru' %}Автомобили{% else %}Avtomobillar{% endif %}</a>
                         </li>
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold" href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist <span id="wishlist-count" class="badge bg-warning text-dark">0</span></a>
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> {% if lang == 'ru' %}Избранное{% else %}Wishlist{% endif %} <span id="wishlist-count" class="badge bg-warning text-dark">0</span></a>
                         </li>
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold" href="{% url 'faq' %}">FAQ</a>
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'contact' %}">{% if lang == 'ru' %}Контакты{% else %}Aloqa{% endif %}</a>
                         </li>
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold" href="{% url 'contact' %}">Aloqa</a>
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'settings' %}">Sozlamalar</a>
                         </li>
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold" href="{% url 'cart' %}">Savat <span id="cart-count" class="badge bg-danger">0</span></a>
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'cart' %}">{% if lang == 'ru' %}Корзина{% else %}Savat{% endif %} <span id="cart-count" class="badge bg-danger">0</span></a>
                         </li>
                     </ul>
+                    {% endwith %}
                 </div>
                 <div class="d-flex align-items-center" id="authSection">
                     <!-- Theme toggle button (light / dark) -->
                     <button id="theme-toggle" class="btn btn-outline-light me-3" aria-label="Toggle theme">
                         <i class="fas fa-moon"></i>
                     </button>
+                    <!-- Lang switcher -->
+                    <div class="btn-group me-3 d-none d-md-inline-flex" role="group" aria-label="Language">
+                        <a class="btn btn-outline-light btn-sm" href="{% url 'set_language' %}?lang=uz&next={{ request.path }}">UZ</a>
+                        <a class="btn btn-outline-light btn-sm" href="{% url 'set_language' %}?lang=ru&next={{ request.path }}">RU</a>
+                        <a class="btn btn-outline-light btn-sm" href="{% url 'set_language' %}?lang=en&next={{ request.path }}">EN</a>
+                    </div>
                     {% if user.is_authenticated %}
                         <span class="text-light me-3">Salom, {{ user.first_name|default:user.username }}!</span>
                         <a href="{% url 'logout' %}" class="btn btn-outline-light">Chiqish</a>
@@ -294,7 +685,10 @@
             <div class="row row-cols-2 row-cols-md-3 g-3">
                 {% for product in products %}
                 <div class="col mb-4">
-                    <div class="card product-card shadow-sm h-100">
+                    <div class="card product-card shadow-sm h-100 position-relative">
+                        {% if product.has_discount %}
+                            <span class="badge bg-danger position-absolute" style="top:10px;left:10px;border-radius:8px;">-{{ product.discount_percent }}%</span>
+                        {% endif %}
                         {% if product.image %}
                             <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
                         {% else %}
@@ -305,7 +699,12 @@
                             <p class="card-text text-muted">{{ product.description|truncatewords:20 }}</p>
                             <div class="mt-auto">
                                 <p class="card-text">
-                                    <strong class="text-primary fs-4">${{ product.price }}</strong>
+                                    {% if product.has_discount %}
+                                        <span class="text-muted text-decoration-line-through me-2">${{ product.price }}</span>
+                                        <strong class="text-danger fs-4">${{ product.discounted_price|floatformat:2 }}</strong>
+                                    {% else %}
+                                        <strong class="text-primary fs-4">${{ product.price }}</strong>
+                                    {% endif %}
                                     {% if product.stock > 0 %}
                                         <small class="text-success">• Omborda: {{ product.stock }} ta</small>
                                     {% else %}
@@ -318,9 +717,15 @@
                                     </a>
                                     <div class="btn-group" role="group">
                                         {% if product.stock > 0 %}
-                                            <button class="btn btn-primary add-to-cart-btn" data-id="{{ product.id }}">
-                                                <i class="fas fa-cart-plus"></i> Savatchaga
-                                            </button>
+                                            {% if user.is_authenticated %}
+                                                <button class="btn btn-primary add-to-cart-btn" data-id="{{ product.id }}">
+                                                    <i class="fas fa-cart-plus"></i> Savatchaga
+                                                </button>
+                                            {% else %}
+                                                <a class="btn btn-primary" href="{% url 'register' %}">
+                                                    <i class="fas fa-cart-plus"></i> Savatchaga
+                                                </a>
+                                            {% endif %}
                                         {% else %}
                                             <button class="btn btn-secondary" disabled>
                                                 <i class="fas fa-times"></i> Omborda yo'q
@@ -408,22 +813,164 @@
         </div>
     </footer>
 
+    
+
     <!-- Mobile bottom navigation -->
     <div class="mobile-bottom-nav d-md-none">
-        <a href="{% url 'home' %}"><i class="fas fa-home icon"></i><span>Uy</span></a>
-        <a href="{% url 'product_list' %}"><i class="fas fa-th-list icon"></i><span>Kategoriyalar</span></a>
-        <a href="{% url 'wishlist' %}"><i class="fas fa-heart icon"></i><span>Sevimlilar</span><span id="mobile-wishlist-count" class="badge bg-warning text-dark">0</span></a>
-        <a href="{% url 'cart' %}"><i class="fas fa-shopping-cart icon"></i><span>Savat</span><span id="mobile-cart-count" class="badge bg-danger">0</span></a>
+        {% with lang=lang %}
+        <a href="{% url 'home' %}"><i class="fas fa-home icon"></i><span>{% if lang == 'ru' %}Главная{% else %}Uy{% endif %}</span></a>
+        <a href="{% url 'product_list' %}"><i class="fas fa-th-list icon"></i><span>{% if lang == 'ru' %}Товары{% else %}Mahsulotlar{% endif %}</span></a>
+        <a href="{% url 'wishlist' %}"><i class="fas fa-heart icon"></i><span>{% if lang == 'ru' %}Избранное{% else %}Sevimlilar{% endif %}</span><span id="mobile-wishlist-count" class="badge bg-warning text-dark">0</span></a>
+        <a href="{% url 'cart' %}"><i class="fas fa-shopping-cart icon"></i><span>{% if lang == 'ru' %}Корзина{% elif lang == 'en' %}Cart{% else %}Savat{% endif %}</span><span id="mobile-cart-count" class="badge bg-danger">0</span></a>
         {% if user.is_authenticated %}
-            <a href="{% url 'user_profile' %}"><i class="fas fa-user icon"></i><span>Profil</span></a>
+            <a href="{% url 'user_profile' %}"><i class="fas fa-user icon"></i><span>{% if lang == 'ru' %}Профиль{% elif lang == 'en' %}Profile{% else %}Profil{% endif %}</span></a>
         {% else %}
-            <a href="{% url 'register' %}"><i class="fas fa-user icon"></i><span>Kirish</span></a>
+            <a href="{% url 'register' %}"><i class="fas fa-user icon"></i><span>{% if lang == 'ru' %}Войти{% elif lang == 'en' %}Login{% else %}Kirish{% endif %}</span></a>
         {% endif %}
+        {% endwith %}
     </div>
 
+    <!-- Floating Settings Button (Mobile - Bottom Right) -->
+    <a href="{% url 'settings' %}" class="fab-settings d-md-none" aria-label="Sozlamalar" style="position:fixed;right:14px;bottom:86px;z-index:1050;width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.25);text-decoration:none;">
+        <i class="fas fa-cog"></i>
+    </a>
+    
+    <!-- Desktop Settings Button (Top Right) -->
+    <a href="{% url 'settings' %}" class="fab-settings d-none d-md-flex" aria-label="Sozlamalar">
+        <i class="fas fa-cog"></i>
+    </a>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% load static %}{% static 'script.js' %}"></script>
+    <script src="{% static 'script.js' %}"></script>
     <script src="animations.js"></script>
     <script src="advanced-features.js"></script>
+    <script src="{% static 'enhanced-features.js' %}"></script>
+    <script>
+        // Mobile Search Functionality with Animation
+        const searchInput = document.getElementById('mobileSearchInput');
+        const clearSearchBtn = document.getElementById('clearSearch');
+        
+        searchInput?.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            const productCards = document.querySelectorAll('.product-card');
+            
+            // Show/hide clear button
+            if (searchTerm) {
+                clearSearchBtn.classList.add('show');
+            } else {
+                clearSearchBtn.classList.remove('show');
+            }
+            
+            let visibleCount = 0;
+            productCards.forEach((card, index) => {
+                const title = card.querySelector('.card-title')?.textContent.toLowerCase();
+                const description = card.querySelector('.card-text')?.textContent.toLowerCase();
+                const parent = card.parentElement;
+                
+                if (title?.includes(searchTerm) || description?.includes(searchTerm)) {
+                    parent.style.display = 'block';
+                    parent.style.animation = `fadeIn 0.4s ease ${index * 0.05}s both`;
+                    visibleCount++;
+                } else {
+                    parent.style.display = 'none';
+                }
+            });
+            
+            // Show no results message
+            showSearchResults(visibleCount, searchTerm);
+        });
+        
+        // Clear search
+        clearSearchBtn?.addEventListener('click', function() {
+            searchInput.value = '';
+            clearSearchBtn.classList.remove('show');
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.parentElement.style.display = 'block';
+            });
+            removeSearchResults();
+        });
+        
+        // Category Filter
+        document.querySelectorAll('.category-pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                // Remove active from all
+                document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+                // Add active to clicked
+                this.classList.add('active');
+                
+                const category = this.dataset.category;
+                const productCards = document.querySelectorAll('.product-card');
+                
+                productCards.forEach((card, index) => {
+                    const parent = card.parentElement;
+                    if (category === 'all') {
+                        parent.style.display = 'block';
+                        parent.style.animation = `fadeIn 0.4s ease ${index * 0.05}s both`;
+                    } else {
+                        // You can add data-category attribute to cards for real filtering
+                        parent.style.display = 'block';
+                        parent.style.animation = `fadeIn 0.4s ease ${index * 0.05}s both`;
+                    }
+                });
+            });
+        });
+        
+        function showSearchResults(count, term) {
+            removeSearchResults();
+            if (term && count === 0) {
+                const container = document.querySelector('.row.row-cols-2');
+                const noResults = document.createElement('div');
+                noResults.className = 'col-12 text-center py-5';
+                noResults.id = 'noResults';
+                noResults.innerHTML = `
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4>Hech narsa topilmadi</h4>
+                    <p class="text-muted">"${term}" uchun natija yo'q</p>
+                `;
+                container?.appendChild(noResults);
+            }
+        }
+        
+        function removeSearchResults() {
+            document.getElementById('noResults')?.remove();
+        }
+        
+        // Add fadeIn animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Update mobile cart count
+        function updateMobileCartCount() {
+            const cartCount = document.getElementById('cart-count')?.textContent || '0';
+            const mobileCartBadge = document.getElementById('mobileCartCount');
+            if (mobileCartBadge) {
+                mobileCartBadge.textContent = cartCount;
+            }
+        }
+        
+        // Call on page load
+        updateMobileCartCount();
+        
+        // Update every 2 seconds
+        setInterval(updateMobileCartCount, 2000);
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('{% static 'service-worker.js' %}');
+            });
+        }
+    </script>
 </body>
 </html>

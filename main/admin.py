@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, Cart, CartItem, Order, OrderItem, ContactMessage, Address, Wishlist, UserProfile
+from .models import Category, Product, ProductImage, Cart, CartItem, Order, OrderItem, ContactMessage, Address, Wishlist, UserProfile
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -7,12 +7,18 @@ class CategoryAdmin(admin.ModelAdmin):
     list_filter = ['created_at']
     search_fields = ['name', 'description']
 
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 3
+    fields = ['image', 'order']
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'price', 'stock', 'is_active', 'is_featured', 'created_at']
-    list_filter = ['category', 'is_active', 'is_featured', 'created_at']
+    list_display = ['name', 'category', 'price', 'discount_percent', 'stock', 'is_active', 'is_featured', 'created_at']
+    list_filter = ['category', 'is_active', 'is_featured', 'created_at', 'discount_percent']
     search_fields = ['name', 'description']
-    list_editable = ['price', 'stock', 'is_active', 'is_featured']
+    list_editable = ['price', 'discount_percent', 'stock', 'is_active', 'is_featured']
+    inlines = [ProductImageInline]
 
 class CartItemInline(admin.TabularInline):
     model = CartItem
@@ -70,6 +76,28 @@ class WishlistAdmin(admin.ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'phone', 'created_at']
-    search_fields = ['user__username', 'phone']
-    readonly_fields = ['created_at']
+    list_display = ['user', 'phone', 'region', 'email_verified', 'total_orders', 'total_spent', 'created_at']
+    list_filter = ['region', 'email_verified', 'gender', 'created_at']
+    search_fields = ['user__username', 'user__email', 'phone', 'city', 'telegram_username']
+    readonly_fields = ['created_at', 'updated_at', 'total_orders', 'total_spent']
+    
+    fieldsets = (
+        ('Foydalanuvchi', {
+            'fields': ('user', 'avatar', 'bio')
+        }),
+        ('Shaxsiy ma\'lumotlar', {
+            'fields': ('phone', 'date_of_birth', 'gender')
+        }),
+        ('Manzil', {
+            'fields': ('region', 'city', 'address', 'postal_code')
+        }),
+        ('Aloqa', {
+            'fields': ('telegram_username', 'whatsapp_number')
+        }),
+        ('Email tasdiqlash', {
+            'fields': ('email_verified', 'email_verification_code')
+        }),
+        ('Statistika', {
+            'fields': ('total_orders', 'total_spent', 'created_at', 'updated_at')
+        }),
+    )

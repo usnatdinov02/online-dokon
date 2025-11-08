@@ -5,8 +5,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Aloqa - Biz bilan bog'laning</title>
+    <meta name="theme-color" content="#000000">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        .quick-actions{position:fixed;right:14px;bottom:86px;z-index:1050;display:flex;flex-direction:column;gap:12px}
+        .quick-actions a{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;box-shadow:0 10px 24px rgba(0,0,0,.25);backdrop-filter:blur(6px)}
+        .qa-call{background:#28a745}
+        .qa-wa{background:#25D366}
+        .qa-tg{background:#0088cc}
+        @media(min-width:768px){.quick-actions{display:none}}
+    </style>
 </head>
 <body>
     <div class="container my-5">
@@ -50,4 +59,21 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+</html>
+
+<!-- Quick actions (mobile) only on contact page -->
+<div class="quick-actions d-md-none">
+    <a class="qa-call" href="tel:+998900000000" aria-label="Call">
+        <i class="fas fa-phone"></i>
+    </a>
+    <a class="qa-wa" href="https://wa.me/998900000000" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <a class="qa-tg" href="https://t.me/your_channel" target="_blank" rel="noopener" aria-label="Telegram">
+        <i class="fab fa-telegram"></i>
+    </a>
+</div>
+
+<!-- Floating Settings Button -->
+<a href="{% url 'settings' %}" class="d-md-none" aria-label="Sozlamalar" style="position:fixed;right:14px;bottom:150px;z-index:1050;width:54px;height:54px;border-radius:16px;background:#343a40;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.25);text-decoration:none"><i class="fas fa-gear"></i></a>
 </html>

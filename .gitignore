@@ -1,4 +1,4 @@
-﻿# Python
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
@@ -18,6 +18,11 @@ staticfiles/
 media/
 .db.sqlite3-journal
 db.sqlite3
+
+# Environment variables
+.env
+.env.local
+.env.production
 
 # OS files
 .DS_Store

@@ -21,6 +21,7 @@ class Product(models.Model):
     name = models.CharField(max_length=200, verbose_name="Mahsulot nomi")
     description = models.TextField(verbose_name="Tavsif")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Narx")
+    discount_percent = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(90)], verbose_name="Skidka (%)")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', verbose_name="Kategoriya")
     image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name="Asosiy rasm")
     stock = models.PositiveIntegerField(default=0, verbose_name="Ombordagi miqdor")
@@ -36,6 +37,31 @@ class Product(models.Model):
     
     def __str__(self):
         return self.name
+
+    @property
+    def has_discount(self):
+        return (self.discount_percent or 0) > 0
+
+    @property
+    def discounted_price(self):
+        if self.has_discount:
+            return self.price * (100 - self.discount_percent) / 100
+        return self.price
+
+class ProductImage(models.Model):
+    """Mahsulot uchun qo'shimcha rasmlar"""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images', verbose_name="Mahsulot")
+    image = models.ImageField(upload_to='products/gallery/', verbose_name="Rasm")
+    order = models.PositiveIntegerField(default=0, verbose_name="Tartib")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Mahsulot rasmi"
+        verbose_name_plural = "Mahsulot rasmlari"
+        ordering = ['order', 'created_at']
+    
+    def __str__(self):
+        return f"{self.product.name} - Rasm {self.order}"
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -68,7 +94,8 @@ class CartItem(models.Model):
     
     @property
     def total_price(self):
-        return self.product.price * self.quantity
+        # Use discounted price if available
+        return self.product.discounted_price * self.quantity
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -186,16 +213,75 @@ class Wishlist(models.Model):
 
 
 class UserProfile(models.Model):
-    """Additional user data (avatar, bio, phone etc.)"""
+    """Foydalanuvchi profili - to'liq ma'lumotlar"""
+    
+    # O'zbekiston viloyatlari
+    REGIONS = [
+        ('tashkent_city', 'Toshkent shahri'),
+        ('tashkent', 'Toshkent viloyati'),
+        ('andijan', 'Andijon'),
+        ('bukhara', 'Buxoro'),
+        ('fergana', 'Farg\'ona'),
+        ('jizzakh', 'Jizzax'),
+        ('namangan', 'Namangan'),
+        ('navoi', 'Navoiy'),
+        ('kashkadarya', 'Qashqadaryo'),
+        ('samarkand', 'Samarqand'),
+        ('sirdarya', 'Sirdaryo'),
+        ('surkhandarya', 'Surxondaryo'),
+        ('karakalpakstan', 'Qoraqalpog\'iston'),
+    ]
+    
+    GENDER_CHOICES = [
+        ('male', 'Erkak'),
+        ('female', 'Ayol'),
+        ('other', 'Boshqa'),
+    ]
+    
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='profile')
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
-    bio = models.TextField(blank=True)
-    phone = models.CharField(max_length=30, blank=True)
+    
+    # Shaxsiy ma'lumotlar
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name='Avatar')
+    bio = models.TextField(blank=True, verbose_name='Bio')
+    phone = models.CharField(max_length=30, blank=True, verbose_name='Telefon')
+    date_of_birth = models.DateField(blank=True, null=True, verbose_name='Tug\'ilgan sana')
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, verbose_name='Jins')
+    
+    # Manzil ma'lumotlari
+    region = models.CharField(max_length=50, choices=REGIONS, blank=True, verbose_name='Viloyat')
+    city = models.CharField(max_length=100, blank=True, verbose_name='Shahar/Tuman')
+    address = models.TextField(blank=True, verbose_name='To\'liq manzil')
+    postal_code = models.CharField(max_length=20, blank=True, verbose_name='Pochta indeksi')
+    
+    # Qo'shimcha ma'lumotlar
+    telegram_username = models.CharField(max_length=100, blank=True, verbose_name='Telegram')
+    whatsapp_number = models.CharField(max_length=30, blank=True, verbose_name='WhatsApp')
+    
+    # Email tasdiqlash
+    email_verified = models.BooleanField(default=False, verbose_name='Email tasdiqlangan')
+    email_verification_code = models.CharField(max_length=6, blank=True, verbose_name='Tasdiqlash kodi')
+    
+    # Statistika
+    total_orders = models.PositiveIntegerField(default=0, verbose_name='Jami buyurtmalar')
+    total_spent = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Jami xarajat')
+    
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = 'Foydalanuvchi profili'
         verbose_name_plural = 'Foydalanuvchi profillari'
 
     def __str__(self):
-        return f"{self.user.username} profile"
+        return f"{self.user.username} - {self.get_region_display() or 'Manzil kiritilmagan'}"
+    
+    def get_full_address(self):
+        """To'liq manzilni qaytarish"""
+        parts = []
+        if self.address:
+            parts.append(self.address)
+        if self.city:
+            parts.append(self.city)
+        if self.region:
+            parts.append(self.get_region_display())
+        return ', '.join(parts) if parts else 'Manzil kiritilmagan'

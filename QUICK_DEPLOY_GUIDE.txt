@@ -1,0 +1,99 @@
+═══════════════════════════════════════════════════════════════
+🚀 PYTHONANYWHERE GA TEZKOR DEPLOY QILISH QO'LLANMASI
+═══════════════════════════════════════════════════════════════
+
+📋 QADAMLAR:
+
+1️⃣ PYTHONANYWHERE GA KIRISH
+   - https://www.pythonanywhere.com ga kiring
+   - Web tabiga o'ting
+   - "Add a new web app" tugmasini bosing
+   - "Manual configuration" > Python 3.10 ni tanlang
+
+2️⃣ LOYIHANI YUKLASH
+   Bash Console ni oching:
+   
+   cd ~
+   # Loyihani zip qilib yuklang va unzip qiling
+   # yoki git clone qiling
+   
+3️⃣ VIRTUAL ENVIRONMENT
+   
+   mkvirtualenv --python=/usr/bin/python3.10 myenv
+   workon myenv
+   cd mercedes_shop
+   pip install -r requirements.txt
+
+4️⃣ WSGI FAYLNI SOZLASH
+   - Web tab > WSGI configuration file ni oching
+   - Hamma narsani o'chiring
+   - pythonanywhere_wsgi.py faylidagi kodni ko'chiring
+   - MUHIM: Quyidagi qatorni o'zgartiring:
+   
+     path = '/home/SIZNING_USERNAME/mercedes_shop'
+     
+   - Save qiling
+
+5️⃣ STATIC VA MEDIA FAYLLAR
+   Bash Console da:
+   
+   python manage.py collectstatic --noinput
+   mkdir -p media
+   
+   Web tab da Static files qo'shing:
+   URL: /static/
+   Directory: /home/SIZNING_USERNAME/mercedes_shop/staticfiles
+   
+   URL: /media/
+   Directory: /home/SIZNING_USERNAME/mercedes_shop/media
+
+6️⃣ DATABASE
+   
+   python manage.py migrate
+   python manage.py createsuperuser
+
+7️⃣ RELOAD QILING
+   - Web tab > Reload tugmasini bosing (yashil tugma)
+   - Saytingizni oching: https://SIZNING_USERNAME.pythonanywhere.com
+
+═══════════════════════════════════════════════════════════════
+❌ XATOLAR VA YECHIMLAR
+═══════════════════════════════════════════════════════════════
+
+XATO: "ImportError: No module named 'django'"
+YECHIM: Virtual environment to'g'ri sozlanmagan
+        WSGI faylda virtual env yo'lini tekshiring
+
+XATO: "ModuleNotFoundError: No module named 'setting'"
+YECHIM: WSGI faylda path to'g'ri emas
+        path = '/home/USERNAME/mercedes_shop' ni tekshiring
+
+XATO: Static fayllar yuklanmayapti
+YECHIM: collectstatic qayta bajaring
+        Web tab da Static files yo'lini tekshiring
+
+XATO: "DisallowedHost at /"
+YECHIM: settings.py da ALLOWED_HOSTS ni to'g'rilang
+        ALLOWED_HOSTS = ['USERNAME.pythonanywhere.com']
+
+═══════════════════════════════════════════════════════════════
+📁 YARATILGAN FAYLLAR
+═══════════════════════════════════════════════════════════════
+
+✅ pythonanywhere_wsgi.py - PythonAnywhere uchun WSGI fayl
+✅ PYTHONANYWHERE_DEPLOY.md - Batafsil qo'llanma
+✅ production_settings.py - Production sozlamalari
+✅ deploy_commands.sh - Deploy script
+✅ .env.example - Environment variables namunasi
+
+═══════════════════════════════════════════════════════════════
+🔍 LOG FAYLLARNI TEKSHIRISH
+═══════════════════════════════════════════════════════════════
+
+Agar xato bo'lsa:
+- Web tab > Log files > Error log
+- Web tab > Log files > Server log
+
+═══════════════════════════════════════════════════════════════
+✅ TAYYOR!
+═══════════════════════════════════════════════════════════════

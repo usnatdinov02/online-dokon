@@ -10,11 +10,15 @@ urlpatterns = [
     path('faq/', views.faq, name='faq'),
     path('contact/', views.contact, name='contact'),
     path('terms/', views.terms, name='terms'),
+    path('settings/', views.settings_view, name='settings'),
+    path('set-language/', views.set_language, name='set_language'),
     
     # Foydalanuvchi
     path('register/', views.register, name='register'),
     path('logout/', views.user_logout, name='logout'),
     path('profile/', views.user_profile, name='user_profile'),
+    path('profile/send-verification/', views.send_email_verification, name='send_email_verification'),
+    path('profile/verify-email/', views.verify_email, name='verify_email'),
     path('orders/', views.order_history, name='order_history'),
     path('order/<int:order_id>/', views.order_detail, name='order_detail'),
     
@@ -44,4 +48,13 @@ urlpatterns = [
     path('addresses/', views.address_list, name='address_list'),
     path('addresses/add/', views.address_add, name='address_add'),
     path('addresses/<int:address_id>/delete/', views.address_delete, name='address_delete'),
+    
+    # Admin Analytics
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/export/orders/', views.export_orders, name='export_orders'),
+    path('admin/export/products/', views.export_products, name='export_products'),
+    
+    # API Endpoints
+    path('api/search-suggestions/', views.api_search_suggestions, name='api_search_suggestions'),
+    path('api/product/<int:product_id>/stock/', views.api_product_stock, name='api_product_stock'),
 ]

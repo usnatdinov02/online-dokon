@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseNotFound, HttpResponseServerError
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -177,28 +177,23 @@ def address_delete(request, address_id):
     addr.delete()
     messages.success(request, 'Manzil o\'chirildi')
     return redirect('address_list')
-
 def terms(request):
     """Foydalanish shartlari"""
     return render(request, 'terms.html')
 
 def product_list(request):
-    """Mahsulotlar ro'yxati"""
+    """Mahsulotlar ro'yxati - Advanced filtering"""
+    from .filters import ProductFilter
+    
     products = Product.objects.filter(is_active=True)
     categories = Category.objects.all()
     
-    # Qidiruv
-    search_query = request.GET.get('search')
-    if search_query:
-        products = products.filter(
-            Q(name__icontains=search_query) | 
-            Q(description__icontains=search_query)
-        )
+    # Apply filters
+    product_filter = ProductFilter(products, request.GET)
+    products = product_filter.filter()
     
-    # Kategoriya bo'yicha filtr
-    category_id = request.GET.get('category')
-    if category_id:
-        products = products.filter(category_id=category_id)
+    # Get price range
+    min_price, max_price = ProductFilter.get_price_range(Product.objects.filter(is_active=True))
     
     # Pagination
     paginator = Paginator(products, 12)
@@ -208,8 +203,15 @@ def product_list(request):
     context = {
         'products': products,
         'categories': categories,
-        'search_query': search_query,
-        'selected_category': category_id,
+        'search_query': request.GET.get('search', ''),
+        'selected_category': request.GET.get('category', ''),
+        'min_price': min_price,
+        'max_price': max_price,
+        'current_min': request.GET.get('min_price', ''),
+        'current_max': request.GET.get('max_price', ''),
+        'sort_by': request.GET.get('sort', '-created_at'),
+        'has_discount': request.GET.get('has_discount', ''),
+        'in_stock': request.GET.get('in_stock', ''),
     }
     return render(request, 'products.html', context)
 
@@ -265,6 +267,43 @@ def product_detail(request, product_id):
         'fake_reviews': fake_reviews,
     }
     return render(request, 'product_detail.html', context)
+
+def settings_view(request):
+    """Foydalanuvchi sozlamalari (til, tema, tezkor havolalar)"""
+    # Simple session-based language toggle
+    if request.GET.get('lang') in ['uz', 'ru']:
+        request.session['lang'] = request.GET['lang']
+    # Theme toggle via query (also persisted on client via localStorage)
+    if request.GET.get('theme') in ['light', 'dark']:
+        request.session['theme'] = request.GET['theme']
+    ctx = {
+        'current_lang': request.session.get('lang', 'uz'),
+        'current_theme': request.session.get('theme', 'light'),
+    }
+    return render(request, 'settings.html', ctx)
+
+def set_language(request):
+    """Tilni o'zgartirish - Django i18n bilan"""
+    from django.utils import translation
+    from django.conf import settings
+    
+    lang = request.GET.get('lang')
+    if lang in ['uz', 'ru', 'en']:
+        # Session va cookie da saqlash
+        request.session['lang'] = lang
+        request.session['django_language'] = lang
+        translation.activate(lang)
+        
+    next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') or '/'
+    response = redirect(next_url)
+    response.set_cookie(
+        settings.LANGUAGE_COOKIE_NAME,
+        lang,
+        max_age=settings.LANGUAGE_COOKIE_AGE,
+        path=settings.LANGUAGE_COOKIE_PATH,
+        domain=settings.LANGUAGE_COOKIE_DOMAIN,
+    )
+    return response
 
 def cart_view(request):
     """Savatcha sahifasi"""
@@ -501,15 +540,83 @@ def cancel_order(request, order_id):
 
 @login_required
 def user_profile(request):
-    """Foydalanuvchi profili"""
+    """Foydalanuvchi profili - to'liq ma'lumotlar bilan"""
     user = request.user
+    profile, created = UserProfile.objects.get_or_create(user=user)
     orders = Order.objects.filter(user=user).order_by('-created_at')[:10]
+    
+    if request.method == 'POST':
+        # Profil ma'lumotlarini yangilash
+        profile.phone = request.POST.get('phone', '')
+        profile.date_of_birth = request.POST.get('date_of_birth') or None
+        profile.gender = request.POST.get('gender', '')
+        profile.region = request.POST.get('region', '')
+        profile.city = request.POST.get('city', '')
+        profile.address = request.POST.get('address', '')
+        profile.postal_code = request.POST.get('postal_code', '')
+        profile.telegram_username = request.POST.get('telegram', '')
+        profile.whatsapp_number = request.POST.get('whatsapp', '')
+        profile.bio = request.POST.get('bio', '')
+        
+        # Avatar yuklash
+        if 'avatar' in request.FILES:
+            profile.avatar = request.FILES['avatar']
+        
+        profile.save()
+        
+        # User ma'lumotlarini yangilash
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.save()
+        
+        messages.success(request, 'Profil muvaffaqiyatli yangilandi!')
+        return redirect('user_profile')
     
     context = {
         'user': user,
+        'profile': profile,
         'orders': orders,
+        'regions': UserProfile.REGIONS,
     }
     return render(request, 'user_profile.html', context)
+
+@login_required
+def send_email_verification(request):
+    """Email tasdiqlash kodini yuborish"""
+    from .email_utils import generate_verification_code, send_verification_email
+    
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+    
+    # Kod generatsiya qilish
+    code = generate_verification_code()
+    profile.email_verification_code = code
+    profile.save()
+    
+    # Email yuborish (development da console ga chiqadi)
+    try:
+        send_verification_email(request.user.email, code)
+        messages.success(request, f'Tasdiqlash kodi: {code} (Development mode: console ga chiqdi)')
+    except Exception as e:
+        messages.error(request, f'Email yuborishda xatolik: {str(e)}')
+    
+    return redirect('user_profile')
+
+@login_required
+def verify_email(request):
+    """Email tasdiqlash"""
+    if request.method == 'POST':
+        code = request.POST.get('verification_code', '').strip()
+        profile = request.user.profile
+        
+        if code == profile.email_verification_code:
+            profile.email_verified = True
+            profile.email_verification_code = ''
+            profile.save()
+            messages.success(request, 'Email muvaffaqiyatli tasdiqlandi!')
+        else:
+            messages.error(request, 'Noto\'g\'ri tasdiqlash kodi!')
+    
+    return redirect('user_profile')
 
 @login_required
 def order_history(request):
@@ -573,3 +680,106 @@ def add_review(request, product_id):
         return redirect('product_detail', product_id=product.id)
 
     return redirect('product_detail', product_id=product.id)
+
+# Error handlers
+def custom_404(request, exception):
+    """Custom 404 error page"""
+    return HttpResponseNotFound(render(request, '404.html'))
+
+def custom_500(request):
+    """Custom 500 error page"""
+    return HttpResponseServerError(render(request, '500.html'))
+
+# Admin Analytics
+@login_required
+def admin_dashboard(request):
+    """Admin analytics dashboard"""
+    if not request.user.is_staff:
+        messages.error(request, 'Bu sahifa faqat adminlar uchun!')
+        return redirect('home')
+    
+    from .analytics import SalesAnalytics
+    
+    stats = SalesAnalytics.get_dashboard_stats()
+    top_products = SalesAnalytics.get_top_products(10)
+    sales_by_region = SalesAnalytics.get_sales_by_region()
+    daily_sales = SalesAnalytics.get_daily_sales(30)
+    low_stock = SalesAnalytics.get_low_stock_products(5)
+    
+    context = {
+        'stats': stats,
+        'top_products': top_products,
+        'sales_by_region': sales_by_region,
+        'daily_sales': daily_sales,
+        'low_stock': low_stock,
+    }
+    return render(request, 'admin_dashboard.html', context)
+
+@login_required
+def export_orders(request):
+    """Export orders to CSV"""
+    if not request.user.is_staff:
+        return redirect('home')
+    
+    from django.http import HttpResponse
+    from .analytics import ExportUtility
+    
+    orders = Order.objects.all().order_by('-created_at')
+    csv_data = ExportUtility.export_orders_csv(orders)
+    
+    response = HttpResponse(csv_data, content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="orders.csv"'
+    return response
+
+@login_required
+def export_products(request):
+    """Export products to CSV"""
+    if not request.user.is_staff:
+        return redirect('home')
+    
+    from django.http import HttpResponse
+    from .analytics import ExportUtility
+    
+    products = Product.objects.all().order_by('name')
+    csv_data = ExportUtility.export_products_csv(products)
+    
+    response = HttpResponse(csv_data, content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="products.csv"'
+    return response
+
+# API Endpoints
+def api_search_suggestions(request):
+    """API: Search suggestions for autocomplete"""
+    query = request.GET.get('q', '').strip()
+    
+    if len(query) < 2:
+        return JsonResponse({'suggestions': []})
+    
+    products = Product.objects.filter(
+        Q(name__icontains=query) | Q(description__icontains=query),
+        is_active=True
+    )[:10]
+    
+    suggestions = [
+        {
+            'id': p.id,
+            'name': p.name,
+            'price': str(p.price),
+            'image': p.image.url if p.image else None,
+        }
+        for p in products
+    ]
+    
+    return JsonResponse({'suggestions': suggestions})
+
+def api_product_stock(request, product_id):
+    """API: Check product stock"""
+    try:
+        product = Product.objects.get(id=product_id, is_active=True)
+        return JsonResponse({
+            'success': True,
+            'stock': product.stock,
+            'in_stock': product.stock > 0
+        })
+    except Product.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Product not found'}, status=404)

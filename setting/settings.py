@@ -12,20 +12,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-test-key-for-development-only'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Production uchun DEBUG = False qiling
+DEBUG = True  # Development uchun True, Production da False
 
-ALLOWED_HOSTS = ['*']
+# PythonAnywhere uchun ALLOWED_HOSTS
+# O'z domeningizni qo'shing: 'delux.pythonanywhere.com'
+ALLOWED_HOSTS = ['*', 'delux.pythonanywhere.com', 'localhost', '127.0.0.1']
+
+# Custom error pages
+handler404 = 'main.views.custom_404'
+handler500 = 'main.views.custom_500'
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/usnadtinov02/mercedes_shop/staticfiles'
+STATIC_ROOT = '/home/delux/online-dokon/staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'setting' / 'templates',
 ]
 
 # Media files
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/home/usnadtinov02/mercedes_shop/media'
+MEDIA_ROOT = '/home/delux/online-dokon/media'
 
 # Application definition
 INSTALLED_APPS = [
@@ -41,12 +48,24 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # Ko'p tillilik uchun
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Security Settings
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SESSION_COOKIE_SECURE = False  # Production da True qiling
+CSRF_COOKIE_SECURE = False  # Production da True qiling
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
 
 # ⚠️ MUHIM: Asosiy URL fayl — setting/urls.py
 ROOT_URLCONF = 'setting.urls'
@@ -62,6 +81,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'main.context_processors.language_context',
             ],
         },
     },
@@ -94,10 +114,29 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = 'uz'
+TIME_ZONE = 'Asia/Tashkent'
 USE_I18N = True
+USE_L10N = True
 USE_TZ = True
+
+# Supported languages
+LANGUAGES = [
+    ('uz', 'O\'zbekcha'),
+    ('ru', 'Русский'),
+    ('en', 'English'),
+]
+
+# Locale paths
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
+# Language cookie settings
+LANGUAGE_COOKIE_NAME = 'django_language'
+LANGUAGE_COOKIE_AGE = 365 * 24 * 60 * 60  # 1 yil
+LANGUAGE_COOKIE_PATH = '/'
+LANGUAGE_COOKIE_DOMAIN = None
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
@@ -122,3 +161,43 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',
 }
+
+# Email Configuration (Gmail)
+# Development uchun console backend (email console ga chiqadi)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Production uchun Gmail SMTP (uncomment qiling va ma'lumotlarni kiriting)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@gmail.com'  # O'zingizning Gmail manzilingiz
+# EMAIL_HOST_PASSWORD = 'your-app-password'  # Gmail App Password
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# IMPORTANT: Gmail App Password olish uchun:
+# 1. Google Account Settings > Security
+# 2. 2-Step Verification ni yoqing
+# 3. App Passwords > Mail > Generate
+# 4. Olingan parolni EMAIL_HOST_PASSWORD ga qo'ying
+
+# Caching Configuration
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'TIMEOUT': 300,  # 5 minutes
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000
+        }
+    }
+}
+
+# Session Configuration
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
+SESSION_SAVE_EVERY_REQUEST = False
+
+# Database Optimization
+# For production, use connection pooling
+CONN_MAX_AGE = 60  # Keep connections alive for 60 seconds

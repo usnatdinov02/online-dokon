@@ -33,10 +33,13 @@ Professional e-commerce sayt Mercedes-Benz avtomobillari uchun.
 
 ## 🚀 O'rnatish
 
+### Local Development
+
 ```bash
 # Virtual environment
 python -m venv venv
-venv\Scripts\activate
+venv\Scripts\activate  # Windows
+source venv/bin/activate  # Linux/Mac
 
 # Dependencies
 pip install -r requirements.txt
@@ -49,6 +52,23 @@ python manage.py createsuperuser
 
 # Run
 python manage.py runserver
+```
+
+### 🌐 PythonAnywhere ga Deploy qilish
+
+Batafsil qo'llanma uchun [PYTHONANYWHERE_DEPLOY.md](PYTHONANYWHERE_DEPLOY.md) faylini o'qing.
+
+**Qisqacha:**
+1. PythonAnywhere ga loyihani yuklang
+2. Virtual environment yarating va requirements o'rnating
+3. `pythonanywhere_wsgi.py` faylidagi kodni WSGI configuration ga ko'chiring
+4. Static/Media yo'llarini sozlang
+5. Database migratsiyalarini bajaring
+6. Web app ni reload qiling
+
+```bash
+# Deploy buyruqlari (PythonAnywhere Bash Console da)
+bash deploy_commands.sh
 ```
 
 ## 📧 Gmail Sozlash

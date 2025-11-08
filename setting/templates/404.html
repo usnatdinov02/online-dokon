@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Sahifa topilmadi | Mercedes-Benz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .error-container {
+            text-align: center;
+            color: white;
+            padding: 40px;
+        }
+        .error-code {
+            font-size: 150px;
+            font-weight: 900;
+            line-height: 1;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: bounce 2s infinite;
+        }
+        .error-message {
+            font-size: 32px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        .error-description {
+            font-size: 18px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        .btn-home {
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .btn-home:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            color: #764ba2;
+        }
+        .car-icon {
+            font-size: 100px;
+            margin-bottom: 30px;
+            animation: drive 3s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes drive {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(30px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="car-icon">
+            <i class="fas fa-car"></i>
+        </div>
+        <div class="error-code">404</div>
+        <div class="error-message">Sahifa topilmadi</div>
+        <div class="error-description">
+            Kechirasiz, siz qidirayotgan sahifa mavjud emas yoki ko'chirilgan.
+        </div>
+        <a href="/" class="btn-home">
+            <i class="fas fa-home me-2"></i>Bosh sahifaga qaytish
+        </a>
+    </div>
+</body>
+</html>

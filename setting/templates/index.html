@@ -1,18 +1,37 @@
 <!DOCTYPE html>
 <html lang="uz">
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Mercedes-Benz - Rasmiy Do'kon</title>
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="{% static 'manifest.webmanifest' %}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="Mercedes-Benzning rasmiy onlayn do'koni. Eng so'nggi modellar, xavfsizlik, komfort va texnologiyalar.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% load static %}{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Mobile Responsive Fixes */
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
+        :root{--mb-primary:#0d6efd;--mb-primary-2:#6610f2;--mb-shadow:0 8px 24px rgba(13,110,253,.25)}
+        /* Floating quick actions (mobile) */
+        .quick-actions{position:fixed;right:14px;bottom:86px;z-index:1050;display:flex;flex-direction:column;gap:12px}
+        .quick-actions a{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;box-shadow:0 10px 24px rgba(0,0,0,.25);backdrop-filter:blur(6px)}
+        .qa-call{background:#28a745}
+        .qa-wa{background:#25D366}
+        .qa-tg{background:#0088cc}
+        @media(min-width:768px){.quick-actions{display:none}}
+
+        .mobile-bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-around;padding:.45rem .25rem;z-index:1040}
+        .mobile-bottom-nav a{color:#eaeaea;text-decoration:none;font-size:.8rem;display:flex;flex-direction:column;align-items:center;gap:2px}
+        .mobile-bottom-nav .icon{font-size:1.2rem;margin-bottom:2px;color:#fff}
+        .mobile-bottom-nav a:hover{color:#fff}
+        /* Floating settings button */
+        .fab-settings{position:fixed;right:14px;bottom:150px;z-index:1050;width:54px;height:54px;border-radius:16px;background:#343a40;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.25);text-decoration:none}
+        .fab-settings:hover{filter:brightness(1.1)}
         
         body {
             overflow-x: hidden;
@@ -71,10 +90,15 @@
             .hero .carousel-item img {
                 max-height: 250px;
             }
-            
             .carousel-caption {
                 display: none !important;
             }
+        }
+        
+        /* Category Cards - Compact & Round */
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.2) !important;
         }
         
         /* Product Grid - 2 columns on mobile */
@@ -91,6 +115,40 @@
                 max-width: 50%;
                 padding-left: 0.5rem;
                 padding-right: 0.5rem;
+            }
+            
+            /* Category cards extra small mobile */
+            .category-icon {
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 1.1rem !important;
+            }
+            
+            .category-card .card-title {
+                font-size: 0.7rem !important;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero .carousel-item img {
+                max-height: 300px;
+            }
+            
+            /* Category cards mobile */
+            .category-card {
+                padding: 0.75rem 0.25rem !important;
+            }
+            
+            .category-icon {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 1.2rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+            .category-card .card-title {
+                font-size: 0.75rem !important;
             }
         }
         
@@ -124,10 +182,13 @@
         }
         
         .product-card .btn,
-        .category-card .btn {
-            font-size: 0.95rem;
-            padding: 0.6rem 1rem;
-        }
+        .category-card .btn {font-size:.95rem;padding:.6rem 1rem;border-radius:12px}
+        .btn-primary{background:linear-gradient(135deg,var(--mb-primary),var(--mb-primary-2));border:none;box-shadow:var(--mb-shadow)}
+        .btn-primary:hover{filter:brightness(.95);transform:translateY(-1px)}
+        .btn-outline-primary{border-radius:12px;border-color:var(--mb-primary);color:var(--mb-primary)}
+        .btn-outline-primary:hover{background:var(--mb-primary);color:#fff}
+        .btn-outline-danger{border-radius:12px}
+        .btn{transition:all .2s ease}
         
         /* Tablet adjustments */
         @media (max-width: 992px) {
@@ -200,25 +261,25 @@
                 <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold active" href="{% url 'home' %}">Bosh Sahifa</a>
+                            <a class="nav-link text-uppercase fw-bold active" href="{% url 'home' %}">{{ t.home }}</a>
                         </li>
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold" href="{% url 'product_list' %}">Avtomobillar</a>
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'product_list' %}">{{ t.cars }}</a>
                         </li>
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold" href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> Wishlist <span id="wishlist-count" class="badge bg-warning text-dark">0</span></a>
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'wishlist' %}"><i class="fas fa-heart"></i> {{ t.wishlist }} <span id="wishlist-count" class="badge bg-warning text-dark">0</span></a>
                         </li>
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold" href="{% url 'faq' %}">FAQ</a>
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'contact' %}">{{ t.contact }}</a>
                         </li>
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold" href="{% url 'contact' %}">Aloqa</a>
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'settings' %}">{{ t.settings }}</a>
                         </li>
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold" href="{% url 'cart' %}">Savat <span id="cart-count" class="badge bg-danger">0</span></a>
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'cart' %}">{{ t.cart }} <span id="cart-count" class="badge bg-danger">0</span></a>
                         </li>
                         <li class="nav-item mx-3">
-                            <a class="nav-link text-uppercase fw-bold" href="{% url 'info' %}">Sayt haqida</a>
+                            <a class="nav-link text-uppercase fw-bold" href="{% url 'info' %}">{{ t.about_site|default:"Sayt haqida" }}</a>
                         </li>
                     </ul>
                 
@@ -229,12 +290,18 @@
                     <button id="theme-toggle" class="btn btn-outline-light me-3" aria-label="Toggle theme">
                         <i class="fas fa-moon"></i>
                     </button>
+                    <!-- Lang switcher -->
+                    <div class="btn-group me-3 d-none d-md-inline-flex" role="group" aria-label="Language">
+                        <a class="btn btn-outline-light btn-sm" href="{% url 'set_language' %}?lang=uz&next={{ request.path }}">UZ</a>
+                        <a class="btn btn-outline-light btn-sm" href="{% url 'set_language' %}?lang=ru&next={{ request.path }}">RU</a>
+                        <a class="btn btn-outline-light btn-sm" href="{% url 'set_language' %}?lang=en&next={{ request.path }}">EN</a>
+                    </div>
                     {% if user.is_authenticated %}
-                        <span class="text-light me-3">Salom, {{ user.first_name|default:user.username }}!</span>
-                        <a href="{% url 'logout' %}" class="btn btn-outline-light">Chiqish</a>
+                        <span class="text-light me-3">{{ t.hello }}, {{ user.first_name|default:user.username }}!</span>
+                        <a href="{% url 'logout' %}" class="btn btn-outline-light">{{ t.logout }}</a>
                     {% else %}
-                        <a href="{% url 'register' %}" class="btn btn-outline-light me-2">Ro'yxatdan o'tish</a>
-                        <a href="{% url 'admin:login' %}" class="btn btn-outline-light">Kirish</a>
+                        <a href="{% url 'register' %}" class="btn btn-outline-light me-2">{{ t.register }}</a>
+                        <a href="{% url 'admin:login' %}" class="btn btn-outline-light">{{ t.login }}</a>
                     {% endif %}
                 </div>
             </div>
@@ -286,11 +353,14 @@
     <main class="main-content">
         <section class="products-section">
             <div class="container my-5">
-                <h2 class="text-center mb-4 section-title">Mashhur Modellar</h2>
+                <h2 class="text-center mb-4 section-title">{{ t.popular_products }}</h2>
                 <div class="row row-cols-2 row-cols-md-3 g-3">
                     {% for product in featured_products %}
                     <div class="col mb-4">
-                        <div class="card product-card shadow-sm">
+                        <div class="card product-card shadow-sm position-relative">
+                            {% if product.has_discount %}
+                                <span class="badge bg-danger position-absolute" style="top:10px;left:10px;border-radius:8px;">-{{ product.discount_percent }}%</span>
+                            {% endif %}
                             {% if product.image %}
                                 <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
                             {% else %}
@@ -299,11 +369,24 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{ product.name }}</h5>
                                 <p class="card-text">{{ product.description|truncatewords:15 }}</p>
-                                <p class="card-text"><strong>${{ product.price }}</strong></p>
+                                <p class="card-text">
+                                    {% if product.has_discount %}
+                                        <span class="text-muted text-decoration-line-through me-2">${{ product.price }}</span>
+                                        <strong class="text-danger">${{ product.discounted_price|floatformat:2 }}</strong>
+                                    {% else %}
+                                        <strong>${{ product.price }}</strong>
+                                    {% endif %}
+                                </p>
                                 <div class="d-flex justify-content-between">
-                                    <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary">Batafsil</a>
+                                    <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-primary">{{ t.view_details }}</a>
                                     <div class="btn-group" role="group">
-                                        <button class="btn btn-primary add-to-cart-btn" data-id="{{ product.id }}">Savatchaga qo'shish</button>
+                                        {% if user.is_authenticated %}
+                                            <button class="btn btn-primary add-to-cart-btn" data-id="{{ product.id }}">{{ t.add_to_cart }}</button>
+                                        {% else %}
+                                            <a class="btn btn-primary" href="{% url 'register' %}">
+                                                {{ t.add_to_cart }}
+                                            </a>
+                                        {% endif %}
                                         {% if user.is_authenticated %}
                                             <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-outline-danger" title="Wishlist-ga qo'shish"><i class="fas fa-heart"></i></a>
                                         {% else %}
@@ -326,26 +409,40 @@
         <!-- Categories Section -->
         <section class="categories-section">
             <div class="container my-5">
-                <h2 class="text-center mb-4 section-title">Kategoriyalar</h2>
-                <div class="row row-cols-2 row-cols-md-3 g-3">
+                <h2 class="text-center mb-4 section-title">{{ t.categories }}</h2>
+                <div class="row row-cols-3 row-cols-md-4 row-cols-lg-6 g-3">
                     {% for category in categories %}
-                    <div class="col mb-4">
-                        <div class="card category-card shadow-sm">
-                            {% if category.image %}
-                                <img src="{{ category.image.url }}" class="card-img-top" alt="{{ category.name }}">
-                            {% else %}
-                                <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top" alt="{{ category.name }}">
-                            {% endif %}
-                            <div class="card-body text-center">
-                                <h5 class="card-title">{{ category.name }}</h5>
-                                <p class="card-text">{{ category.description|truncatewords:10 }}</p>
-                                <a href="{% url 'category_products' category.id %}" class="btn btn-primary">Ko'rish</a>
+                    <div class="col">
+                        <a href="{% url 'category_products' category.id %}" class="text-decoration-none">
+                            <div class="category-card" style="text-align:center;padding:1rem 0.5rem;border-radius:20px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.08);transition:all 0.3s ease;">
+                                <div class="category-icon" style="width:60px;height:60px;margin:0 auto 0.75rem;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex !important;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;box-shadow:0 4px 12px rgba(102,126,234,0.3);">
+                                    {% if 'sedan' in category.name|lower %}
+                                        <i class="fas fa-car" style="color:#fff;"></i>
+                                    {% elif 'suv' in category.name|lower %}
+                                        <i class="fas fa-truck" style="color:#fff;"></i>
+                                    {% elif 'coupe' in category.name|lower %}
+                                        <i class="fas fa-car-side" style="color:#fff;"></i>
+                                    {% elif 'elektr' in category.name|lower or 'electric' in category.name|lower %}
+                                        <i class="fas fa-bolt" style="color:#fff;"></i>
+                                    {% elif 'sport' in category.name|lower %}
+                                        <i class="fas fa-flag-checkered" style="color:#fff;"></i>
+                                    {% elif 'crossover' in category.name|lower %}
+                                        <i class="fas fa-shuttle-van" style="color:#fff;"></i>
+                                    {% elif 'minivan' in category.name|lower %}
+                                        <i class="fas fa-van-shuttle" style="color:#fff;"></i>
+                                    {% elif 'truck' in category.name|lower or 'yuk' in category.name|lower %}
+                                        <i class="fas fa-truck-pickup" style="color:#fff;"></i>
+                                    {% else %}
+                                        <i class="fas fa-car" style="color:#fff;"></i>
+                                    {% endif %}
+                                </div>
+                                <h6 class="card-title" style="font-size:0.9rem;font-weight:600;color:#1a1a2e;margin-bottom:0;">{{ category.name }}</h6>
                             </div>
-                        </div>
+                        </a>
                     </div>
                     {% empty %}
                     <div class="col-12">
-                        <p class="text-center">Hozircha kategoriyalar yo'q.</p>
+                        <p class="text-center text-muted">Hozircha kategoriyalar yo'q.</p>
                     </div>
                     {% endfor %}
                 </div>
@@ -356,10 +453,12 @@
     <!-- Footer -->
     <footer class="bg-dark text-white text-center py-4">
         <div class="container">
-            <p>&copy; 2025 Mercedes-Benz. Barcha huquqlar himoyalangan.</p>
-            <p><a href="{% url 'terms' %}" class="text-white">Foydalanish shartlari</a> | <a href="{% url 'contact' %}" class="text-white">Aloqa</a></p>
+            <p>&copy; 2025 Mercedes-Benz. {{ t.all_rights_reserved }}.</p>
+            <p><a href="{% url 'terms' %}" class="text-white">{{ t.terms_of_use }}</a> | <a href="{% url 'contact' %}" class="text-white">{{ t.contact }}</a></p>
         </div>
     </footer>
+
+    
 
     <!-- Modal for Product Details -->
     <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
@@ -373,8 +472,8 @@
                     <!-- Modal tarkibi dinamik ravishda joylanadi -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Yopish</button>
-                    <button type="button" class="btn btn-primary add-to-cart-btn" data-id="">Savatchaga qo'shish</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t.cancel }}</button>
+                    <button type="button" class="btn btn-primary add-to-cart-btn" data-id="">{{ t.add_to_cart }}</button>
                 </div>
             </div>
         </div>
@@ -382,20 +481,40 @@
     
             <!-- Mobile bottom navigation -->
             <div class="mobile-bottom-nav d-md-none">
-                <a href="{% url 'home' %}"><i class="fas fa-home icon"></i><span>Uy</span></a>
-                <a href="{% url 'product_list' %}"><i class="fas fa-th-list icon"></i><span>Kategoriyalar</span></a>
-                <a href="{% url 'wishlist' %}"><i class="fas fa-heart icon"></i><span>Sevimlilar</span><span id="mobile-wishlist-count" class="badge bg-warning text-dark">0</span></a>
-                <a href="{% url 'cart' %}"><i class="fas fa-shopping-cart icon"></i><span>Savat</span><span id="mobile-cart-count" class="badge bg-danger">0</span></a>
+                <a href="{% url 'home' %}"><i class="fas fa-home icon"></i><span>{{ t.home }}</span></a>
+                <a href="{% url 'product_list' %}"><i class="fas fa-th-list icon"></i><span>{{ t.products }}</span></a>
+                <a href="{% url 'wishlist' %}"><i class="fas fa-heart icon"></i><span>{{ t.wishlist }}</span><span id="mobile-wishlist-count" class="badge bg-warning text-dark">0</span></a>
+                <a href="{% url 'cart' %}"><i class="fas fa-shopping-cart icon"></i><span>{{ t.cart }}</span><span id="mobile-cart-count" class="badge bg-danger">0</span></a>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'user_profile' %}"><i class="fas fa-user icon"></i><span>Profil</span></a>
+                    <a href="{% url 'user_profile' %}"><i class="fas fa-user icon"></i><span>{{ t.profile }}</span></a>
                 {% else %}
-                    <a href="{% url 'register' %}"><i class="fas fa-user icon"></i><span>Kirish</span></a>
+                    <a href="{% url 'register' %}"><i class="fas fa-user icon"></i><span>{{ t.login }}</span></a>
                 {% endif %}
             </div>
 
+            <!-- Floating Settings Button (Mobile - Bottom Right, Desktop - Top Right) -->
+            <a href="{% url 'settings' %}" class="fab-settings d-md-none" aria-label="Sozlamalar" style="position:fixed;right:14px;bottom:150px;z-index:1050;width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.25);text-decoration:none;">
+                <i class="fas fa-cog"></i>
+            </a>
+            
+            <!-- Desktop Settings Button -->
+            <a href="{% url 'settings' %}" class="d-none d-md-flex" aria-label="Sozlamalar" style="position:fixed;right:20px;top:100px;z-index:1050;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(102,126,234,0.3);text-decoration:none;transition:all 0.3s ease;">
+                <i class="fas fa-cog"></i>
+            </a>
+
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="{% load static %}{% static 'script.js' %}"></script>
+            <script src="{% static 'script.js' %}"></script>
             <script src="animations.js"></script>
             <script src="advanced-features.js"></script>
+            <script src="{% static 'enhanced-features.js' %}"></script>
+            <script src="mobile-enhancements.js"></script>
+            <link rel="stylesheet" href="mobile-styles.css">
+            <script>
+                if ('serviceWorker' in navigator) {
+                    window.addEventListener('load', function() {
+                        navigator.serviceWorker.register('{% static 'service-worker.js' %}');
+                    });
+                }
+            </script>
 </body>
 </html>

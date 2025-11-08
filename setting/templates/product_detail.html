@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>{{ product.name }} - Mercedes-Benz</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% load static %}{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Mobile Responsive Fixes */
@@ -55,17 +56,74 @@
             }
         }
         
-        /* Product Image - Desktop */
-        .product-image-container {
+        /* Product Image Gallery */
+        .product-image-gallery {
             width: 100%;
-            overflow: hidden;
         }
         
-        .product-image-container img {
+        .main-image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .main-image-container img {
             width: 100%;
             height: auto;
             max-height: 500px;
             object-fit: cover;
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+        
+        .main-image-container img:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Thumbnail Gallery */
+        .thumbnail-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .thumbnail-item {
+            position: relative;
+            cursor: pointer;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .thumbnail-item:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+        }
+        
+        .thumbnail-item.active {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+        }
+        
+        .thumbnail-item img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .thumbnail-gallery {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            
+            .thumbnail-item img {
+                height: 60px;
+            }
         }
         
         /* Product Title - Desktop */
@@ -259,14 +317,34 @@
     <main class="main-content">
         <div class="container my-5">
             <div class="row">
-                <!-- Product Image -->
+                <!-- Product Image Gallery -->
                 <div class="col-lg-6 mb-4">
-                    <div class="product-image-container">
-                        {% if product.image %}
-                            <img src="{{ product.image.url }}" class="img-fluid rounded shadow" alt="{{ product.name }}" id="main-image">
-                        {% else %}
-                            <img src="https://via.placeholder.com/600x400?text=No+Image" class="img-fluid rounded shadow" alt="{{ product.name }}" id="main-image">
-                        {% endif %}
+                    <div class="product-image-gallery">
+                        <!-- Main Image -->
+                        <div class="main-image-container mb-3">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" class="img-fluid rounded shadow" alt="{{ product.name }}" id="main-image">
+                            {% else %}
+                                <img src="https://via.placeholder.com/600x400?text=No+Image" class="img-fluid rounded shadow" alt="{{ product.name }}" id="main-image">
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Thumbnail Gallery -->
+                        <div class="thumbnail-gallery">
+                            <!-- Main Image Thumbnail -->
+                            {% if product.image %}
+                            <div class="thumbnail-item active" data-image="{{ product.image.url }}">
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Additional Images -->
+                            {% for image in product.images.all %}
+                            <div class="thumbnail-item" data-image="{{ image.image.url }}">
+                                <img src="{{ image.image.url }}" alt="{{ product.name }}">
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
 
@@ -283,7 +361,15 @@
                         </div>
 
                         <div class="price-section mb-4">
-                            <h2 class="text-primary mb-0">${{ product.price }}</h2>
+                            {% if product.has_discount %}
+                                <div>
+                                    <span class="text-muted text-decoration-line-through me-2 fs-5">${{ product.price }}</span>
+                                    <span class="badge bg-danger me-2">-{{ product.discount_percent }}%</span>
+                                </div>
+                                <h2 class="text-danger mb-0">${{ product.discounted_price|floatformat:2 }}</h2>
+                            {% else %}
+                                <h2 class="text-primary mb-0">${{ product.price }}</h2>
+                            {% endif %}
                             {% if product.stock > 0 %}
                                 <p class="text-success mb-0">
                                     <i class="fas fa-check-circle"></i> Omborda: {{ product.stock }} ta
@@ -309,12 +395,21 @@
                                     </div>
                                 </div>
                                 <div class="d-grid gap-2 d-md-flex">
-                                    <button class="btn btn-primary btn-lg add-to-cart-btn" data-id="{{ product.id }}">
-                                        <i class="fas fa-cart-plus"></i> Savatchaga qo'shish
-                                    </button>
-                                    <button class="btn btn-outline-secondary btn-lg">
-                                        <i class="fas fa-heart"></i> Sevimlilar
-                                    </button>
+                                    {% if user.is_authenticated %}
+                                        <button class="btn btn-primary btn-lg add-to-cart-btn" data-id="{{ product.id }}">
+                                            <i class="fas fa-cart-plus"></i> Savatchaga qo'shish
+                                        </button>
+                                        <a class="btn btn-outline-secondary btn-lg" href="{% url 'add_to_wishlist' product.id %}">
+                                            <i class="fas fa-heart"></i> Sevimlilar
+                                        </a>
+                                    {% else %}
+                                        <a class="btn btn-primary btn-lg" href="{% url 'register' %}">
+                                            <i class="fas fa-cart-plus"></i> Savatchaga qo'shish
+                                        </a>
+                                        <a class="btn btn-outline-secondary btn-lg" href="{% url 'register' %}">
+                                            <i class="fas fa-heart"></i> Sevimlilar
+                                        </a>
+                                    {% endif %}
                                 </div>
                             {% else %}
                                 <div class="alert alert-warning" role="alert">
@@ -362,9 +457,15 @@
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             {% if related_product.stock > 0 %}
-                                                <button class="btn btn-primary btn-sm add-to-cart-btn" data-id="{{ related_product.id }}">
-                                                    <i class="fas fa-cart-plus"></i>
-                                                </button>
+                                                {% if user.is_authenticated %}
+                                                    <button class="btn btn-primary btn-sm add-to-cart-btn" data-id="{{ related_product.id }}">
+                                                        <i class="fas fa-cart-plus"></i>
+                                                    </button>
+                                                {% else %}
+                                                    <a class="btn btn-primary btn-sm" href="{% url 'register' %}">
+                                                        <i class="fas fa-cart-plus"></i>
+                                                    </a>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                     </div>
@@ -503,9 +604,56 @@
         {% endif %}
     </div>
 
+    <!-- Floating Settings Button -->
+    <a href="{% url 'settings' %}" class="fab-settings d-md-none" aria-label="Sozlamalar" style="position:fixed;right:14px;bottom:150px;z-index:1050;width:54px;height:54px;border-radius:16px;background:#343a40;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(0,0,0,.25);text-decoration:none"><i class="fas fa-gear"></i></a>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% load static %}{% static 'script.js' %}"></script>
+    <script src="{% static 'script.js' %}"></script>
     <script src="animations.js"></script>
     <script src="advanced-features.js"></script>
+    <script src="{% static 'enhanced-features.js' %}"></script>
+    
+    <script>
+        // Image Gallery Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainImage = document.getElementById('main-image');
+            const thumbnails = document.querySelectorAll('.thumbnail-item');
+            
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', function() {
+                    // Remove active class from all thumbnails
+                    thumbnails.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked thumbnail
+                    this.classList.add('active');
+                    
+                    // Change main image
+                    const newImageUrl = this.dataset.image;
+                    mainImage.src = newImageUrl;
+                    
+                    // Add animation
+                    mainImage.style.opacity = '0';
+                    setTimeout(() => {
+                        mainImage.style.opacity = '1';
+                    }, 100);
+                });
+            });
+            
+            // Image zoom on click
+            mainImage.addEventListener('click', function() {
+                const modal = document.createElement('div');
+                modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:10000;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+                
+                const img = document.createElement('img');
+                img.src = this.src;
+                img.style.cssText = 'max-width:90%;max-height:90%;object-fit:contain;';
+                
+                modal.appendChild(img);
+                document.body.appendChild(modal);
+                
+                modal.addEventListener('click', () => modal.remove());
+            });
+        });
+    </script>
 </body>
 </html>
