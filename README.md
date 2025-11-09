@@ -99,3 +99,4 @@ bash deploy_commands.sh
 
 **Ishlab chiqildi:** Cascade AI yordamida ❤️
 # online-dokon
+# onlineshop
